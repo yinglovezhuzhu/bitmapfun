@@ -54,10 +54,9 @@ public class ImageCache {
 
     /**
      * Creating a new ImageCache object using the specified parameters.
-     * 创建新ImageCache的对象使用指定的参数。
      *
      * @param context The context to use
-     * @param cacheParams The cache parameters to use to initialize the cache 使用ImageCacheParams参数初始化缓存
+     * @param cacheParams The cache parameters to use to initialize the cache
      */
     public ImageCache(Context context, ImageCacheParams cacheParams) {
         init(context, cacheParams);
@@ -67,7 +66,7 @@ public class ImageCache {
      * Creating a new ImageCache object using the default parameters.
      * 
      * @param context The context to use
-     * @param uniqueName A unique name that will be appended to the cache directory ｜uniqueName一个独特的名字，将被追加到缓存目录
+     * @param uniqueName A unique name that will be appended to the cache directory 
      */
     public ImageCache(Context context, String uniqueName) {
         init(context, new ImageCacheParams(uniqueName));
@@ -115,7 +114,7 @@ public class ImageCache {
 
     /**
      * Initialize the cache, providing all parameters.
-     * 初始化缓存，提供的所有参数。
+     * 
      * @param context The context to use
      * @param cacheParams The cache parameters to initialize the cache
      */

@@ -44,7 +44,6 @@ import java.util.Map.Entry;
  * much more robust and efficient disk LRU cache solution can be found in the ICS source code
  * (libcore/luni/src/main/java/libcore/io/DiskLruCache.java) and is preferable to this simple
  * implementation.
- *  这个类写得非常牛逼呀~
  */
 public class DiskLruCache {
     private static final String TAG = "DiskLruCache";
@@ -254,7 +253,6 @@ public class DiskLruCache {
 
     /**
      * Get a usable cache directory (external if available, internal otherwise).
-     * 获得一个可用的缓存目录（可用的外部存储/<sd卡>，否则使用内部<data/data/package/cache>）。
      *
      * @param context The context to use
      * @param uniqueName A unique directory name to append to the cache dir
