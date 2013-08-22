@@ -122,7 +122,7 @@ import android.os.Process;
  *     <li>{@link #execute} must be invoked on the UI thread.</li>
  *     <li>Do not call {@link #onPreExecute()}, {@link #onPostExecute},
  *     {@link #doInBackground}, {@link #onProgressUpdate} manually.</li>
- *     <li>The task can be executed only once (an exception will be thrown if
+ *     <li>The task can be executed only once (an exception wiln if
  *     a second execution is attempted.)</li>
  * </ul>
  */
@@ -130,7 +130,7 @@ public abstract class AsyncTaskEx<Params, Progress, Result> {
     private static final String LOG_TAG = "AsyncTaskEx";
 
     private static final int CORE_POOL_SIZE = 5;
-    private static final int MAXIMUM_POOL_SIZE = 10;
+    private static final int MAXIMUM_POOL_SIZE = 128;
     private static final int KEEP_ALIVE = 10;
 
     private static final LinkedBlockingQueue<Runnable> sWorkQueue =

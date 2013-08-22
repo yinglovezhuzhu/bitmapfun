@@ -51,7 +51,7 @@ public class Utils {
      * @return size in bytes
      */
     @SuppressLint("NewApi")
-    public static int getBitmapSize(Bitmap bitmap) {
+	public static int getBitmapSize(Bitmap bitmap) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
             return bitmap.getByteCount();
         }

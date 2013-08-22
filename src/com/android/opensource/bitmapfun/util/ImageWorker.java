@@ -85,6 +85,47 @@ public abstract class ImageWorker {
             task.execute(data);
         }
     }
+    
+    /**
+     * 
+     * Load an image specified by the data parameter.
+     * A memory and disk cache will be used if an {@link ImageCache} has been set using
+     * {@link ImageWorker#setImageCache(ImageCache)}. If the image is not found in the memory or disk cache, it
+     * would load from file.
+     *
+     * @param data The URL of the image to download.
+     * @param config The config of bitmap
+     * @return the bitmap
+     */
+    public Bitmap loadImage(Object data, Bitmap.Config config) {
+    	Bitmap bitmap = null;
+    	String dataString = String.valueOf(data);
+        if (mImageCache != null) {
+            bitmap = mImageCache.getBitmapFromMemCache(dataString);
+            if(bitmap == null) {
+            	// Bitmap not found in memory cache
+            	bitmap = mImageCache.getBitmapFromDiskCache(dataString);
+            }
+        }
+
+        if (bitmap == null) {
+        	// Bitmap not found in memory cache and disk cache
+        	try {
+        		bitmap = processBitmap(data, config);
+        	} catch (OutOfMemoryError error) {
+        		error.printStackTrace();
+        		if(mImageCache != null) {
+        			mImageCache.clearCaches();
+        			bitmap = processBitmap(data, config);
+        		}
+        	}
+        }
+        
+        if (bitmap != null && mImageCache != null) {
+            mImageCache.addBitmapToCache(dataString, bitmap);
+        }
+        return bitmap;
+    }
 
     /**
      * 
@@ -158,10 +199,11 @@ public abstract class ImageWorker {
      *
      * @param data The data to identify which image to process, as provided by
      *            {@link ImageWorker#loadImage(Object, ImageView)}
+     * @param config The config of bitmap.
      * 
      * @return The processed bitmap
      */
-    protected abstract Bitmap processBitmap(Object data);
+    protected abstract Bitmap processBitmap(Object data, Bitmap.Config config);
 
     public static void cancelWork(ImageView imageView) {
         final BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
@@ -218,7 +260,7 @@ public abstract class ImageWorker {
     /**
      * The actual AsyncTask that will asynchronously process the image.
      */
-    private class BitmapWorkerTask extends AsyncTaskEx<Object, Void, Bitmap> {
+    private class BitmapWorkerTask extends AsyncTask<Object, Void, Bitmap> {
         private Object data;
         private final WeakReference<ImageView> imageViewReference;
 
@@ -250,7 +292,7 @@ public abstract class ImageWorker {
             // process method (as implemented by a subclass)
             if (bitmap == null && !isCancelled() && getAttachedImageView() != null
                     && !mExitTasksEarly) {
-                bitmap = processBitmap(params[0]);
+                bitmap = processBitmap(params[0], null);
             }
 
             // If the bitmap was processed and the image cache is available, then add the processed

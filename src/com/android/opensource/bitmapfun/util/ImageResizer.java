@@ -82,35 +82,37 @@ public class ImageResizer extends ImageWorker {
      * sampling down the bitmap and returning it from a resource.
      *
      * @param resId
+     * @param config The config of bitmap
      * @return
      */
-    private Bitmap processBitmap(int resId) {
+    private Bitmap processBitmap(int resId, Bitmap.Config config) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "processBitmap - " + resId);
         }
         return decodeSampledBitmapFromResource(
-                mContext.getResources(), resId, mImageWidth, mImageHeight);
+                mContext.getResources(), resId, mImageWidth, mImageHeight, config);
     }
 
     /**
      * The main processing method. This happens in a background task. In this case we are just
      * sampling down the bitmap and returning it from a storage path.
      * @param data
+     * @param config The config of bitmap
      * @return
      */
-    private Bitmap processBitmap(String data) {
+    private Bitmap processBitmap(String data, Bitmap.Config config) {
     	if (BuildConfig.DEBUG) {
     		Log.d(TAG, "processBitmap - " + data);
     	}
-    	return decodeSampledBitmapFromFile(data, mImageWidth, mImageHeight);
+    	return decodeSampledBitmapFromFile(data, mImageWidth, mImageHeight, config);
     }
 
     @Override
-    protected Bitmap processBitmap(Object data) {
+    protected Bitmap processBitmap(Object data, Bitmap.Config config) {
     	if(data instanceof Integer) {
-    		return processBitmap(Integer.parseInt(String.valueOf(data)));
+    		return processBitmap(Integer.parseInt(String.valueOf(data)), config);
     	} else if(data instanceof String) {
-    		return processBitmap(String.valueOf(data));
+    		return processBitmap(String.valueOf(data), config);
     	}
     	return null;
     }
@@ -122,11 +124,12 @@ public class ImageResizer extends ImageWorker {
      * @param resId The resource id of the image data
      * @param reqWidth The requested width of the resulting bitmap
      * @param reqHeight The requested height of the resulting bitmap
+     * @param config The config of bitmap
      * @return A bitmap sampled down from the original with the same aspect ratio and dimensions
      *         that are equal to or greater than the requested width and height
      */
     public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-            int reqWidth, int reqHeight) {
+            int reqWidth, int reqHeight, Bitmap.Config config) {
 
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -135,6 +138,9 @@ public class ImageResizer extends ImageWorker {
 
         // Calculate inSampleSize
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+        if(config != null) {
+        	options.inPreferredConfig = config;
+        }
 
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
@@ -147,11 +153,12 @@ public class ImageResizer extends ImageWorker {
      * @param filename The full path of the file to decode
      * @param reqWidth The requested width of the resulting bitmap
      * @param reqHeight The requested height of the resulting bitmap
+     * @param config The config of bitmap
      * @return A bitmap sampled down from the original with the same aspect ratio and dimensions
      *         that are equal to or greater than the requested width and height
      */
     public static synchronized Bitmap decodeSampledBitmapFromFile(String filename,
-            int reqWidth, int reqHeight) {
+            int reqWidth, int reqHeight, Bitmap.Config config) {
 
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -160,6 +167,9 @@ public class ImageResizer extends ImageWorker {
 
         // Calculate inSampleSize
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+        if(options != null) {
+        	options.inPreferredConfig = config;
+        }
 
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
