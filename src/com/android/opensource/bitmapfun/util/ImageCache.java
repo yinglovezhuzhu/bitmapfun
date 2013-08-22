@@ -187,9 +187,9 @@ public class ImageCache {
      * @param data Unique identifier for which item to get
      * @return The bitmap if found in cache, null otherwise
      */
-    public Bitmap getBitmapFromDiskCache(String data) {
+    public Bitmap getBitmapFromDiskCache(String data, Bitmap.Config config) {
         if (mDiskCache != null) {
-            return mDiskCache.get(data);
+            return mDiskCache.get(data, config);
         }
         return null;
     }

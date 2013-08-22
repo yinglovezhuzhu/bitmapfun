@@ -174,14 +174,18 @@ public class DiskLruCache {
      * @param key The unique identifier for the bitmap
      * @return The bitmap or null if not found
      */
-    public Bitmap get(String key) {
+    public Bitmap get(String key, Bitmap.Config config) {
         synchronized (mLinkedHashMap) {
             final String file = mLinkedHashMap.get(key);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            if(config != null) {
+            	options.inPreferredConfig = config;
+            }
             if (file != null) {
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "Disk cache hit");
                 }
-                return BitmapFactory.decodeFile(file);
+                return BitmapFactory.decodeFile(file, options);
             } else {
                 final String existingFile = createFilePath(mCacheDir, key);
                 if (new File(existingFile).exists()) {
@@ -189,7 +193,7 @@ public class DiskLruCache {
                     if (BuildConfig.DEBUG) {
                         Log.d(TAG, "Disk cache hit (existing file)");
                     }
-                    return BitmapFactory.decodeFile(existingFile);
+                    return BitmapFactory.decodeFile(existingFile, options);
                 }
             }
             return null;

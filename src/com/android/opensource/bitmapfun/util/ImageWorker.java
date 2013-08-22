@@ -85,6 +85,27 @@ public abstract class ImageWorker {
             task.execute(data);
         }
     }
+   
+    /**
+     * 
+     * Load an image specified from a set adapter into an ImageView (override
+     * {@link ImageWorker#processBitmap(Object)} to define the processing logic). A memory and disk
+     * cache will be used if an {@link ImageCache} has been set using
+     * {@link ImageWorker#setImageCache(ImageCache)}. If the image is found in the memory cache, it
+     * is set immediately, otherwise an {@link AsyncTask} will be created to asynchronously load the
+     * bitmap. {@link ImageWorker#setAdapter(ImageWorkerAdapter)} must be called before using this
+     * method.
+     *
+     * @param num The URL index of the image to download.
+     * @param imageView The ImageView to bind the downloaded image to.
+     */
+    public void loadImage(int num, ImageView imageView) {
+        if (mImageWorkerAdapter != null) {
+            loadImage(mImageWorkerAdapter.getItem(num), imageView);
+        } else {
+            throw new NullPointerException("Data not set, must call setAdapter() first.");
+        }
+    }
     
     /**
      * 
@@ -104,7 +125,7 @@ public abstract class ImageWorker {
             bitmap = mImageCache.getBitmapFromMemCache(dataString);
             if(bitmap == null) {
             	// Bitmap not found in memory cache
-            	bitmap = mImageCache.getBitmapFromDiskCache(dataString);
+            	bitmap = mImageCache.getBitmapFromDiskCache(dataString, config);
             }
         }
 
@@ -125,27 +146,6 @@ public abstract class ImageWorker {
             mImageCache.addBitmapToCache(dataString, bitmap);
         }
         return bitmap;
-    }
-
-    /**
-     * 
-     * Load an image specified from a set adapter into an ImageView (override
-     * {@link ImageWorker#processBitmap(Object)} to define the processing logic). A memory and disk
-     * cache will be used if an {@link ImageCache} has been set using
-     * {@link ImageWorker#setImageCache(ImageCache)}. If the image is found in the memory cache, it
-     * is set immediately, otherwise an {@link AsyncTask} will be created to asynchronously load the
-     * bitmap. {@link ImageWorker#setAdapter(ImageWorkerAdapter)} must be called before using this
-     * method.
-     *
-     * @param num The URL index of the image to download.
-     * @param imageView The ImageView to bind the downloaded image to.
-     */
-    public void loadImage(int num, ImageView imageView) {
-        if (mImageWorkerAdapter != null) {
-            loadImage(mImageWorkerAdapter.getItem(num), imageView);
-        } else {
-            throw new NullPointerException("Data not set, must call setAdapter() first.");
-        }
     }
 
     /**
@@ -283,7 +283,7 @@ public abstract class ImageWorker {
             // the cache
             if (mImageCache != null && !isCancelled() && getAttachedImageView() != null
                     && !mExitTasksEarly) {
-                bitmap = mImageCache.getBitmapFromDiskCache(dataString);
+                bitmap = mImageCache.getBitmapFromDiskCache(dataString, null);
             }
 
             // If the bitmap was not found in the cache and this task has not been cancelled by
