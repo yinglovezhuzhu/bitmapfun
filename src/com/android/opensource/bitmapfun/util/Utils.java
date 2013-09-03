@@ -16,6 +16,8 @@
 
 package com.android.opensource.bitmapfun.util;
 
+import java.io.File;
+
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -23,8 +25,6 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
-
-import java.io.File;
 
 /**
  * Class containing some static utility methods.
@@ -133,6 +133,23 @@ public class Utils {
      */
     public static boolean hasExternalCacheDir() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO;
+    }
+    
+    /**
+     * Check if OS has external storage.
+     * @return
+     */
+    public static boolean hasExternalStorage() {
+    	return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
+    }
+    
+    /**
+     * Get internal cache directory.
+     * @param context
+     * @return
+     */
+    public static File getCacheDir(Context context) {
+    	return context.getCacheDir();
     }
 
     /**
