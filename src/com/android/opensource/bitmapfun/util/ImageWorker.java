@@ -16,6 +16,8 @@
 
 package com.android.opensource.bitmapfun.util;
 
+import java.lang.ref.WeakReference;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -30,8 +32,6 @@ import android.widget.ImageView;
 
 import com.android.opensource.bitmapfun.BuildConfig;
 
-import java.lang.ref.WeakReference;
-
 /**
  * This class wraps up completing some arbitrary long running work when loading a bitmap to an
  * ImageView. It handles things like using a memory and disk cache, running the work in a background
@@ -44,6 +44,7 @@ public abstract class ImageWorker {
 
     private ImageCache mImageCache;
     private Bitmap mLoadingBitmap;
+    private Bitmap mLoadingFailedBitmap = null;
     private boolean mFadeInBitmap = true;
     private boolean mExitTasksEarly = false;
 
@@ -165,6 +166,24 @@ public abstract class ImageWorker {
     public void setLoadingImage(int resId) {
         mLoadingBitmap = BitmapFactory.decodeResource(mContext.getResources(), resId);
     }
+    
+    /**
+     * Set placeholder bitmap that shows when the the background thread is running.
+     *
+     * @param bitmap
+     */
+    public void setLoadingFailedImage(Bitmap bitmap) {
+    	mLoadingFailedBitmap = bitmap;
+    }
+    
+    /**
+     * Set placeholder bitmap that shows when the the background thread is running.
+     *
+     * @param resId
+     */
+    public void setLoadingFailedImage(int resId) {
+    	mLoadingFailedBitmap = BitmapFactory.decodeResource(mContext.getResources(), resId);
+    }
 
     /**
      * Set the {@link ImageCache} object to use with this ImageWorker.
@@ -265,6 +284,7 @@ public abstract class ImageWorker {
         private final WeakReference<ImageView> imageViewReference;
 
         public BitmapWorkerTask(ImageView imageView) {
+//        	imageView.setImageBitmap(mLoadingBitmap);
             imageViewReference = new WeakReference<ImageView>(imageView);
         }
 
@@ -319,6 +339,8 @@ public abstract class ImageWorker {
             final ImageView imageView = getAttachedImageView();
             if (bitmap != null && imageView != null) {
                 setImageBitmap(imageView, bitmap);
+            } else {
+            	setImageBitmap(imageView, mLoadingFailedBitmap);
             }
         }
 
@@ -354,7 +376,7 @@ public abstract class ImageWorker {
                 new WeakReference<BitmapWorkerTask>(bitmapWorkerTask);
         }
 
-        public BitmapWorkerTask getBitmapWorkerTask() {
+		public BitmapWorkerTask getBitmapWorkerTask() {
             return bitmapWorkerTaskReference.get();
         }
     }
