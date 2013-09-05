@@ -339,8 +339,6 @@ public abstract class ImageWorker {
             final ImageView imageView = getAttachedImageView();
             if (bitmap != null && imageView != null) {
                 setImageBitmap(imageView, bitmap);
-            } else {
-            	setImageBitmap(imageView, mLoadingFailedBitmap);
             }
         }
 
@@ -388,6 +386,10 @@ public abstract class ImageWorker {
      * @param bitmap
      */
     private void setImageBitmap(ImageView imageView, Bitmap bitmap) {
+    	if(bitmap == null) {
+    		//If bitmap is null, set default failed bitmap.
+    		bitmap = mLoadingFailedBitmap;
+    	}
         if (mFadeInBitmap) {
             // Transition drawable with a transparent drwabale and the final bitmap
             final TransitionDrawable td =
@@ -398,7 +400,9 @@ public abstract class ImageWorker {
             // Set background to loading bitmap
             imageView.setBackgroundDrawable(
                     new BitmapDrawable(mContext.getResources(), mLoadingBitmap));
-
+            
+//            imageView.setImageDrawable(new BitmapDrawable(mContext.getResources(), mLoadingBitmap));
+            
             imageView.setImageDrawable(td);
             td.startTransition(FADE_IN_TIME);
         } else {
