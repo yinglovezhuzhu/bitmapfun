@@ -44,7 +44,7 @@ public abstract class ImageWorker {
 
     private ImageCache mImageCache;
     private Bitmap mLoadingBitmap;
-    private Bitmap mLoadingFailedBitmap = null;
+    private Bitmap mLoadFailedBitmap = null;
     private boolean mFadeInBitmap = true;
     private boolean mExitTasksEarly = false;
 
@@ -168,12 +168,20 @@ public abstract class ImageWorker {
     }
     
     /**
+     * Get placeholder bitmap that shows when the background thread is running.
+     * @return
+     */
+    public Bitmap getLoadingImage() {
+    	return mLoadingBitmap;
+    }
+    
+    /**
      * Set placeholder bitmap that shows when the the background thread is running.
      *
      * @param bitmap
      */
-    public void setLoadingFailedImage(Bitmap bitmap) {
-    	mLoadingFailedBitmap = bitmap;
+    public void setLoadFailedImage(Bitmap bitmap) {
+    	mLoadFailedBitmap = bitmap;
     }
     
     /**
@@ -181,8 +189,16 @@ public abstract class ImageWorker {
      *
      * @param resId
      */
-    public void setLoadingFailedImage(int resId) {
-    	mLoadingFailedBitmap = BitmapFactory.decodeResource(mContext.getResources(), resId);
+    public void setLoadFailedImage(int resId) {
+    	mLoadFailedBitmap = BitmapFactory.decodeResource(mContext.getResources(), resId);
+    }
+    
+    /**
+     * Get placeholder bitmap that shows when the the background thread is running.
+     * @return
+     */
+    public Bitmap getLoadFailedImage() {
+    	return mLoadFailedBitmap;
     }
 
     /**
@@ -388,7 +404,7 @@ public abstract class ImageWorker {
     private void setImageBitmap(ImageView imageView, Bitmap bitmap) {
     	if(bitmap == null) {
     		//If bitmap is null, set default failed bitmap.
-    		bitmap = mLoadingFailedBitmap;
+    		bitmap = mLoadFailedBitmap;
     	}
         if (mFadeInBitmap) {
             // Transition drawable with a transparent drwabale and the final bitmap
