@@ -90,6 +90,34 @@ public abstract class ImageWorker {
             task.execute(data);
         }
     }
+
+    /**
+     * Load an image specified by the data parameter.
+     * A memory and disk cache will be used if an {@link ImageCache} has been set using
+     * {@link ImageWorker#setImageCache(ImageCache)}. If the image is not found in the memory or disk cache, it
+     * would load from file.
+     * @param data
+     * @param imageView
+     * @param config
+     */
+    public void loadImage(Object data, ImageView imageView, Bitmap.Config config) {
+    	Bitmap bitmap = null;
+    	
+    	if (mImageCache != null) {
+    		bitmap = mImageCache.getBitmapFromMemCache(String.valueOf(data));
+    	}
+    	
+    	if (bitmap != null && bitmap.getConfig() == config) {
+    		// Bitmap found in memory cache
+    		imageView.setImageBitmap(bitmap);
+    	} else if (cancelPotentialWork(data, imageView)) {
+    		final BitmapWorkerTask task = new BitmapWorkerTask(imageView, config);
+    		final AsyncDrawable asyncDrawable =
+    				new AsyncDrawable(mContext.getResources(), mLoadingBitmap, task);
+    		imageView.setImageDrawable(asyncDrawable);
+    		task.execute(data);
+    	}
+    }
    
     /**
      * 
@@ -152,7 +180,7 @@ public abstract class ImageWorker {
         }
         return bitmap;
     }
-
+    
     /**
      * Set placeholder bitmap that shows when the the background thread is running.
      *
@@ -265,7 +293,7 @@ public abstract class ImageWorker {
         if (bitmapWorkerTask != null) {
             bitmapWorkerTask.cancel(true);
             if (BuildConfig.DEBUG) {
-                final Object bitmapData = bitmapWorkerTask.data;
+                final Object bitmapData = bitmapWorkerTask.mmData;
                 Log.d(TAG, "cancelWork - cancelled work for " + bitmapData);
             }
         }
@@ -282,7 +310,7 @@ public abstract class ImageWorker {
         final BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
 
         if (bitmapWorkerTask != null) {
-            final Object bitmapData = bitmapWorkerTask.data;
+            final Object bitmapData = bitmapWorkerTask.mmData;
             if (bitmapData == null || !bitmapData.equals(data)) {
                 bitmapWorkerTask.cancel(true);
                 if (BuildConfig.DEBUG) {
@@ -316,12 +344,18 @@ public abstract class ImageWorker {
      * The actual AsyncTask that will asynchronously process the image.
      */
     private class BitmapWorkerTask extends AsyncTask<Object, Void, Bitmap> {
-        private Object data;
-        private final WeakReference<ImageView> imageViewReference;
+        private Object mmData;
+        private final WeakReference<ImageView> mmImageViewReference;
+        private Bitmap.Config mmConfig = Bitmap.Config.ARGB_8888;
 
         public BitmapWorkerTask(ImageView imageView) {
-//        	imageView.setImageBitmap(mLoadingBitmap);
-            imageViewReference = new WeakReference<ImageView>(imageView);
+        	imageView.setImageBitmap(mLoadingBitmap);
+            mmImageViewReference = new WeakReference<ImageView>(imageView);
+        }
+        
+        public BitmapWorkerTask(ImageView imageView, Bitmap.Config config) {
+        	this(imageView);
+        	this.mmConfig = config;
         }
 
         /**
@@ -329,8 +363,8 @@ public abstract class ImageWorker {
          */
         @Override
         protected Bitmap doInBackground(Object... params) {
-            data = params[0];
-            final String dataString = String.valueOf(data);
+            mmData = params[0];
+            final String dataString = String.valueOf(mmData);
             Bitmap bitmap = null;
 
             // If the image cache is available and this task has not been cancelled by another
@@ -339,7 +373,7 @@ public abstract class ImageWorker {
             // the cache
             if (mImageCache != null && !isCancelled() && getAttachedImageView() != null
                     && !mExitTasksEarly) {
-                bitmap = mImageCache.getBitmapFromDiskCache(dataString, null);
+                bitmap = mImageCache.getBitmapFromDiskCache(dataString, mmConfig);
             }
 
             // If the bitmap was not found in the cache and this task has not been cancelled by
@@ -348,7 +382,7 @@ public abstract class ImageWorker {
             // process method (as implemented by a subclass)
             if (bitmap == null && !isCancelled() && getAttachedImageView() != null
                     && !mExitTasksEarly) {
-                bitmap = processBitmap(params[0], null);
+                bitmap = processBitmap(params[0], mmConfig);
             }
 
             // If the bitmap was processed and the image cache is available, then add the processed
@@ -386,7 +420,7 @@ public abstract class ImageWorker {
          * points to this task as well. Returns null otherwise.
          */
         private ImageView getAttachedImageView() {
-            final ImageView imageView = imageViewReference.get();
+            final ImageView imageView = mmImageViewReference.get();
             final BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
 
             if (this == bitmapWorkerTask) {
