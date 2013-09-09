@@ -50,6 +50,10 @@ public abstract class ImageWorker {
 
     protected Context mContext;
     protected ImageWorkerAdapter mImageWorkerAdapter;
+    
+    protected OnBitmapSetListener mOnBitmapSetListener;
+    
+    protected OnBitmapLoadedListener mOnBitmapLoadedListener;
 
     protected ImageWorker(Context context) {
         mContext = context;
@@ -213,6 +217,22 @@ public abstract class ImageWorker {
     public ImageCache getImageCache() {
         return mImageCache;
     }
+    
+    /**
+     * Set the listener on bitmap has been set.
+     * @param listener
+     */
+    public void setOnBitmapSetListener(OnBitmapSetListener listener) {
+    	mOnBitmapSetListener = listener;
+    }
+    
+    /**
+     * Set the listener on bitmap has loaded.
+     * @param listener
+     */
+    public void setOnBitmapLoadedListener(OnBitmapLoadedListener listener) {
+    	mOnBitmapLoadedListener = listener;
+    }
 
     /**
      * If set to true, the image will fade-in once it has been loaded by the background thread.
@@ -347,6 +367,9 @@ public abstract class ImageWorker {
          */
         @Override
         protected void onPostExecute(Bitmap bitmap) {
+        	if(mOnBitmapLoadedListener != null) {
+        		mOnBitmapLoadedListener.onBitmapLoaded(bitmap);
+        	}
             // if cancel was called on this task or the "exit early" flag is set then we're done
             if (isCancelled() || mExitTasksEarly) {
                 bitmap = null;
@@ -424,6 +447,9 @@ public abstract class ImageWorker {
         } else {
             imageView.setImageBitmap(bitmap);
         }
+        if(mOnBitmapSetListener != null) {
+        	mOnBitmapSetListener.onBitmapSet(imageView, bitmap);
+        }
     }
 
     /**
@@ -450,5 +476,13 @@ public abstract class ImageWorker {
     public static abstract class ImageWorkerAdapter {
         public abstract Object getItem(int num);
         public abstract int getSize();
+    }
+    
+    public static interface OnBitmapSetListener {
+    	public void onBitmapSet(ImageView imageView, Bitmap bitmap);
+    }
+    
+    public static interface OnBitmapLoadedListener {
+    	public void onBitmapLoaded(Bitmap bitmap);
     }
 }
