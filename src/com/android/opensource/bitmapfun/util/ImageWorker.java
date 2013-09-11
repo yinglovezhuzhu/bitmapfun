@@ -401,15 +401,15 @@ public abstract class ImageWorker {
          */
         @Override
         protected void onPostExecute(Bitmap bitmap) {
-        	if(mOnBitmapLoadedListener != null) {
-        		mOnBitmapLoadedListener.onBitmapLoaded(bitmap);
-        	}
             // if cancel was called on this task or the "exit early" flag is set then we're done
             if (isCancelled() || mExitTasksEarly) {
                 bitmap = null;
             }
 
             final ImageView imageView = getAttachedImageView();
+            if(mOnBitmapLoadedListener != null) {
+            	mOnBitmapLoadedListener.onBitmapLoaded(imageView, bitmap);
+            }
             if (bitmap != null && imageView != null) {
                 setImageBitmap(imageView, bitmap);
             }
@@ -517,6 +517,6 @@ public abstract class ImageWorker {
     }
     
     public static interface OnBitmapLoadedListener {
-    	public void onBitmapLoaded(Bitmap bitmap);
+    	public void onBitmapLoaded(ImageView imageView, Bitmap bitmap);
     }
 }
