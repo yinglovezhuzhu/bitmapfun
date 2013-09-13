@@ -25,5 +25,4 @@
     android:numColumns="auto_fit"
     android:stretchMode="columnWidth"
     android:verticalSpacing="@dimen/image_thumbnail_spacing" >
-
 </GridView>

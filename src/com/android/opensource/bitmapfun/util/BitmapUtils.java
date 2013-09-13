@@ -98,6 +98,11 @@ public class BitmapUtils {
         return inBitmap;
     }
 	
+	/**
+	 * Get bitmap size, width and height.
+	 * @param url
+	 * @return
+	 */
 	public static Size getBitmapSize(String url) {
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;

@@ -45,10 +45,10 @@ import com.android.opensource.bitmapfun.R;
 import com.android.opensource.bitmapfun.provider.Images;
 import com.android.opensource.bitmapfun.util.DiskLruCache;
 import com.android.opensource.bitmapfun.util.ImageCache;
+import com.android.opensource.bitmapfun.util.ImageCache.ImageCacheParams;
 import com.android.opensource.bitmapfun.util.ImageFetcher;
 import com.android.opensource.bitmapfun.util.ImageResizer;
 import com.android.opensource.bitmapfun.util.Utils;
-import com.android.opensource.bitmapfun.util.ImageCache.ImageCacheParams;
 
 /**
  * The main fragment that powers the ImageGridActivity screen. Fairly straight forward GridView
