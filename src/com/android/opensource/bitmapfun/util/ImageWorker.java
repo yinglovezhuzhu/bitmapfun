@@ -187,7 +187,8 @@ public abstract class ImageWorker {
         		error.printStackTrace();
         		if(mImageCache != null) {
         			mImageCache.clearCaches();
-        			bitmap = processBitmap(data, config);
+//        			bitmap = processBitmap(data, config);
+        			bitmap = loadImage(data, config);
         		}
         	}
         }
@@ -196,6 +197,39 @@ public abstract class ImageWorker {
             mImageCache.addBitmapToCache(dataString, bitmap);
         }
         return bitmap;
+    }
+    
+    /**
+     * Create a mutable bitmap.
+     * @param data
+     * @param width
+     * @param height
+     * @param config
+     * @return
+     */
+    public Bitmap createImage(Object data, int width, int height, Bitmap.Config config) {
+    	Bitmap bitmap = null;
+    	String dataString = String.valueOf(data);
+    	String key = String.valueOf(width) + "x" + String.valueOf(height) + "_" + dataString;
+    	 if (mImageCache != null) {
+             bitmap = mImageCache.getBitmapFromMemCache(key);
+         }
+    	 if(bitmap == null) {
+    		 // Create a mutable bitmap.
+    		 try {
+         		bitmap = Bitmap.createBitmap(width, height, config);
+         	} catch (OutOfMemoryError error) {
+         		error.printStackTrace();
+         		if(mImageCache != null) {
+         			mImageCache.clearMenCache();
+         		}
+         		bitmap = createImage(data, width, height, config);
+         	}
+    	 }
+    	 if (bitmap != null && mImageCache != null) {
+             mImageCache.addBitmapToMenCache(key, bitmap);
+         }
+    	return bitmap;
     }
     
     /**

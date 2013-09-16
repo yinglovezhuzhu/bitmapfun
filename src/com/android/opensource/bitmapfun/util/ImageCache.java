@@ -161,6 +161,17 @@ public class ImageCache {
             mDiskCache.put(data, bitmap);
         }
     }
+    
+    public void addBitmapToMenCache(String key, Bitmap bitmap) {
+    	if(key == null || bitmap == null) {
+    		return;
+    	}
+    	
+    	// Add to memory cache
+        if (mMemoryCache != null && mMemoryCache.get(key) == null) {
+            mMemoryCache.put(key, bitmap);
+        }
+    }
 
     /**
      * Get from memory cache.
@@ -197,6 +208,10 @@ public class ImageCache {
     public void clearCaches() {
         mDiskCache.clearCache();
         mMemoryCache.evictAll();
+    }
+    
+    public void clearMenCache() {
+    	mMemoryCache.evictAll();
     }
 
     /**
