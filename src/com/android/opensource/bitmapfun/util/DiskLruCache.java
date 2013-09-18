@@ -16,15 +16,6 @@
 
 package com.android.opensource.bitmapfun.util;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
-import android.graphics.BitmapFactory;
-import android.os.Environment;
-import android.util.Log;
-
-import com.android.opensource.bitmapfun.BuildConfig;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,6 +29,15 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
+import android.os.Environment;
+import android.util.Log;
+
+import com.android.opensource.bitmapfun.BuildConfig;
 
 /**
  * A simple disk LRU bitmap cache to illustrate how a disk cache would be used for bitmap caching. A

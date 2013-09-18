@@ -16,6 +16,8 @@
 
 package com.android.opensource.bitmapfun.util;
 
+import java.io.File;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -24,8 +26,6 @@ import android.support.v4.util.LruCache;
 import android.util.Log;
 
 import com.android.opensource.bitmapfun.BuildConfig;
-
-import java.io.File;
 
 /**
  * This class holds our bitmap caches (memory and disk).
@@ -200,7 +200,12 @@ public class ImageCache {
      */
     public Bitmap getBitmapFromDiskCache(String data, Bitmap.Config config) {
         if (mDiskCache != null) {
-            return mDiskCache.get(data, config);
+        	try {
+        		return mDiskCache.get(data, config);
+        	} catch (OutOfMemoryError error) {
+        		error.printStackTrace();
+        		return getBitmapFromDiskCache(data, config);
+        	}
         }
         return null;
     }
