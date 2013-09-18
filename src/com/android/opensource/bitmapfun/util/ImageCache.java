@@ -200,12 +200,7 @@ public class ImageCache {
      */
     public Bitmap getBitmapFromDiskCache(String data, Bitmap.Config config) {
         if (mDiskCache != null) {
-        	try {
-        		return mDiskCache.get(data, config);
-        	} catch (OutOfMemoryError error) {
-        		error.printStackTrace();
-        		return getBitmapFromDiskCache(data, config);
-        	}
+        	return mDiskCache.get(data, config);
         }
         return null;
     }
