@@ -16,10 +16,13 @@
 
 package com.android.opensource.bitmapfun.ui;
 
+import java.io.File;
+
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -37,9 +40,7 @@ import android.widget.Toast;
 
 import com.android.opensource.bitmapfun.R;
 import com.android.opensource.bitmapfun.provider.Images;
-import com.android.opensource.bitmapfun.util.DiskLruCache;
 import com.android.opensource.bitmapfun.util.ImageCache;
-import com.android.opensource.bitmapfun.util.ImageFetcher;
 import com.android.opensource.bitmapfun.util.ImageResizer;
 import com.android.opensource.bitmapfun.util.ImageWorker;
 import com.android.opensource.bitmapfun.util.Utils;
@@ -68,9 +69,14 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
 
         // The ImageWorker takes care of loading images into our ImageView children asynchronously
 //        mImageWorker = new ImageFetcher(this, longest);
+        File cachePath = null;
+        if(Utils.hasExternalStorage()) {
+        	File appRoot = new File(Environment.getExternalStorageDirectory(), "BitmapFun");
+        	cachePath = new File(appRoot, ".cache");
+        }
         mImageWorker = new ImageResizer(this, longest);
         mImageWorker.setAdapter(Images.imageThumbWorkerUrlsAdapter);
-        mImageWorker.setImageCache(ImageCache.findOrCreateCache(this, IMAGE_CACHE_DIR));
+        mImageWorker.setImageCache(ImageCache.findOrCreateCache(this, cachePath, IMAGE_CACHE_DIR));
         mImageWorker.setImageFadeIn(false);
 
         // Set up ViewPager and backing adapter
@@ -129,8 +135,9 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
             case R.id.clear_cache:
                 final ImageCache cache = mImageWorker.getImageCache();
                 if (cache != null) {
-                    mImageWorker.getImageCache().clearCaches();
-                    DiskLruCache.clearCache(this, ImageFetcher.HTTP_CACHE_DIR);
+//                    mImageWorker.getImageCache().cleanCaches();
+                    mImageWorker.getImageCache().cleanDiskCache();
+//                    DiskLruCache.clearCache(this, cache.getImageCacheParams().cachePath, IMAGE_CACHE_DIR);
                     Toast.makeText(this, R.string.clear_cache_complete,
                             Toast.LENGTH_SHORT).show();
                 }

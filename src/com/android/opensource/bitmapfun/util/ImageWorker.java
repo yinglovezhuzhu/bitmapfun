@@ -42,14 +42,15 @@ import com.android.opensource.bitmapfun.BuildConfig;
 public abstract class ImageWorker {
     private static final String TAG = "ImageWorker";
     private static final int FADE_IN_TIME = 200;
-
-    private ImageCache mImageCache;
     private Bitmap mLoadingBitmap;
     private Bitmap mLoadFailedBitmap = null;
     private boolean mFadeInBitmap = true;
     private boolean mExitTasksEarly = false;
 
     protected Context mContext;
+    
+    protected static ImageCache mImageCache = null;
+    
     protected ImageWorkerAdapter mImageWorkerAdapter;
     
     protected OnBitmapSetListener mOnBitmapSetListener;
@@ -186,7 +187,7 @@ public abstract class ImageWorker {
         	} catch (OutOfMemoryError error) {
         		error.printStackTrace();
         		if(mImageCache != null) {
-        			mImageCache.clearCaches();
+        			mImageCache.cleanCaches();
 //        			bitmap = processBitmap(data, config);
         			bitmap = loadImage(data, config);
         		}
@@ -221,7 +222,7 @@ public abstract class ImageWorker {
          	} catch (OutOfMemoryError error) {
          		error.printStackTrace();
          		if(mImageCache != null) {
-         			mImageCache.clearMenCache();
+         			mImageCache.cleanMemCache();
          		}
          		bitmap = createImage(data, width, height, config);
          	}
@@ -472,7 +473,7 @@ public abstract class ImageWorker {
             		bitmap = mImageCache.getBitmapFromDiskCache(dataString, mmConfig);
             	} catch (OutOfMemoryError error) {
             		error.printStackTrace();
-            		mImageCache.clearMenCache();
+            		mImageCache.cleanMemCache();
             		bitmap = mImageCache.getBitmapFromDiskCache(dataString, mmConfig);
             	}
             }

@@ -16,11 +16,14 @@
 
 package com.android.opensource.bitmapfun.ui;
 
+import java.io.File;
+
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -43,10 +46,8 @@ import android.widget.Toast;
 import com.android.opensource.bitmapfun.BuildConfig;
 import com.android.opensource.bitmapfun.R;
 import com.android.opensource.bitmapfun.provider.Images;
-import com.android.opensource.bitmapfun.util.DiskLruCache;
 import com.android.opensource.bitmapfun.util.ImageCache;
 import com.android.opensource.bitmapfun.util.ImageCache.ImageCacheParams;
-import com.android.opensource.bitmapfun.util.ImageFetcher;
 import com.android.opensource.bitmapfun.util.ImageResizer;
 import com.android.opensource.bitmapfun.util.Utils;
 
@@ -83,7 +84,12 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
 
         mAdapter = new ImageAdapter(getActivity());
 
-        ImageCacheParams cacheParams = new ImageCacheParams(IMAGE_CACHE_DIR);
+        File cachePath = null;
+        if(Utils.hasExternalStorage()) {
+        	File appRoot = new File(Environment.getExternalStorageDirectory(), "BitmapFun");
+        	cachePath = new File(appRoot, ".cache");
+        }
+        ImageCacheParams cacheParams = new ImageCacheParams(cachePath, IMAGE_CACHE_DIR);
 
         // Allocate a third of the per-app memory limit to the bitmap memory cache. This value
         // should be chosen carefully based on a number of factors. Refer to the corresponding
@@ -169,8 +175,8 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
             case R.id.clear_cache:
                 final ImageCache cache = mImageWorker.getImageCache();
                 if (cache != null) {
-                    mImageWorker.getImageCache().clearCaches();
-                    DiskLruCache.clearCache(getActivity(), ImageFetcher.HTTP_CACHE_DIR);
+                	mImageWorker.getImageCache().cleanDiskCache();
+//                    DiskLruCache.clearCache(getActivity(), cache.getImageCacheParams().cachePath, IMAGE_CACHE_DIR);
                     Toast.makeText(getActivity(), R.string.clear_cache_complete,
                             Toast.LENGTH_SHORT).show();
                 }

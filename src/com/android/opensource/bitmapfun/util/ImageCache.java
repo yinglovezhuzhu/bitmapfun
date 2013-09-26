@@ -51,6 +51,8 @@ public class ImageCache {
     private DiskLruCache mDiskCache;
 
     private LruCache<String, Bitmap> mMemoryCache;
+    
+    private static ImageCacheParams mImageCacheParams = null;
 
     /**
      * Creating a new ImageCache object using the specified parameters.
@@ -81,8 +83,8 @@ public class ImageCache {
      * @return An existing retained ImageCache object or a new one if one did not exist.
      */
     public static ImageCache findOrCreateCache(
-            final FragmentActivity activity, final String uniqueName) {
-        return findOrCreateCache(activity, new ImageCacheParams(uniqueName));
+            final FragmentActivity activity, final File cachPath, final String uniqueName) {
+        return findOrCreateCache(activity, new ImageCacheParams(cachPath, uniqueName));
     }
 
     /**
@@ -119,8 +121,9 @@ public class ImageCache {
      * @param cacheParams The cache parameters to initialize the cache
      */
     private void init(Context context, ImageCacheParams cacheParams) {
+    	mImageCacheParams = cacheParams;
     	//get a cache floder
-        final File diskCacheDir = DiskLruCache.getDiskCacheDir(context, cacheParams.uniqueName);
+        final File diskCacheDir = DiskLruCache.getDiskCacheDir(context, cacheParams.cachePath, cacheParams.uniqueName);
 
         // Set up disk cache
         if (cacheParams.diskCacheEnabled) {
@@ -204,25 +207,47 @@ public class ImageCache {
         		return mDiskCache.get(data, config);
         	} catch (OutOfMemoryError error) {
         		error.printStackTrace();
-        		clearMenCache();
+        		cleanMemCache();
         	}
         }
         return null;
     }
 
-    public void clearCaches() {
+    /**
+     * Clean caches, both memory cache and disk cache.
+     */
+    public void cleanCaches() {
         mDiskCache.clearCache();
         mMemoryCache.evictAll();
     }
     
-    public void clearMenCache() {
+    /**
+     * Clean memory cache.
+     */
+    public void cleanMemCache() {
     	mMemoryCache.evictAll();
+    }
+    
+    /**
+     * Clean disk cache.
+     */
+    public void cleanDiskCache() {
+    	mDiskCache.clearCache();
+    }
+    
+    /**
+     * Get cache params.
+     * @return
+     */
+    public ImageCacheParams getImageCacheParams() {
+    	return mImageCacheParams;
     }
 
     /**
      * A holder class that contains cache parameters.
      */
     public static class ImageCacheParams {
+    	public File cachePath = null;
         public String uniqueName;
         public int memCacheSize = DEFAULT_MEM_CACHE_SIZE;
         public int diskCacheSize = DEFAULT_DISK_CACHE_SIZE;
@@ -234,6 +259,11 @@ public class ImageCache {
 
         public ImageCacheParams(String uniqueName) {
             this.uniqueName = uniqueName;
+        }
+        
+        public ImageCacheParams(File cachePath, String uniqueName) {
+        	this.cachePath = cachePath;
+        	this.uniqueName = uniqueName;
         }
     }
 }

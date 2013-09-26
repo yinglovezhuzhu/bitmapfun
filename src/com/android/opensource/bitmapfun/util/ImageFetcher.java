@@ -121,10 +121,11 @@ public class ImageFetcher extends ImageResizer {
      * @return A File pointing to the fetched bitmap
      */
     public static File downloadBitmap(Context context, String urlString) {
-        final File cacheDir = DiskLruCache.getDiskCacheDir(context, HTTP_CACHE_DIR);
+    	
+        final File cacheDir = DiskLruCache.getDiskCacheDir(context, mImageCache == null ? 
+        		null : mImageCache.getImageCacheParams().cachePath, HTTP_CACHE_DIR);
 
-        final DiskLruCache cache =
-                DiskLruCache.openCache(context, cacheDir, HTTP_CACHE_SIZE);
+        final DiskLruCache cache = DiskLruCache.openCache(context, cacheDir, HTTP_CACHE_SIZE);
 
         final File cacheFile = new File(cache.createFilePath(urlString));
 

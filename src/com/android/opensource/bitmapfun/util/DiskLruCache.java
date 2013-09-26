@@ -34,7 +34,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
-import android.os.Environment;
 import android.util.Log;
 
 import com.android.opensource.bitmapfun.BuildConfig;
@@ -232,12 +231,12 @@ public class DiskLruCache {
     /**
      * Removes all disk cache entries from the application cache directory in the uniqueName
      * sub-directory.
-     *
-     * @param context The context to use
-     * @param uniqueName A unique cache directory name to append to the app cache directory
+     * @param context
+     * @param cachePath
+     * @param uniqueName
      */
-    public static void clearCache(Context context, String uniqueName) {
-        File cacheDir = getDiskCacheDir(context, uniqueName);
+    public static void clearCache(Context context, File cachePath, String uniqueName) {
+        File cacheDir = getDiskCacheDir(context, cachePath, uniqueName);
         clearCache(cacheDir);
     }
 
@@ -250,29 +249,39 @@ public class DiskLruCache {
      */
     private static void clearCache(File cacheDir) {
         final File[] files = cacheDir.listFiles(cacheFileFilter);
-        for (int i=0; i<files.length; i++) {
+        if(files == null) {
+        	return;
+        }
+        for (int i = 0; i < files.length; i++) {
             files[i].delete();
         }
     }
 
     /**
-     * Get a usable cache directory (external if available, internal otherwise).
-     *
-     * @param context The context to use
-     * @param uniqueName A unique directory name to append to the cache dir
-     * @return The cache dir
+     * Get a usable cache directory.(If the custom directory exist or it can be created, get the custom directory, otherwise, get the system cache directory {@link DiskLruCache#getSystemCacheDir(Context)})
+     * @param context
+     * @param cachePath
+     * @param uniqueName
+     * @return
      */
-    public static File getDiskCacheDir(Context context, String uniqueName) {
-
-        // Check if media is mounted or storage is built-in, if so, try and use external cache dir
-        // otherwise use internal cache dir
-        final File cachePath =
-                Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED ||
-                        !Utils.isExternalStorageRemovable() ?
-                        Utils.getExternalCacheDir(context) :
-                        context.getCacheDir();
-
-        return new File(cachePath, uniqueName);
+    public static File getDiskCacheDir(Context context, File cachePath, String uniqueName) {
+    	
+    	if(cachePath != null && (cachePath.exists() || cachePath.mkdirs())) {
+			return new File(cachePath, uniqueName);
+    	}
+    	return new File(getSystemCacheDir(context), uniqueName);
+    }
+    
+    /**
+     * Get System cache directory (external if available, internal otherwise).
+     * @param context
+     * @return
+     */
+    private static File getSystemCacheDir(Context context) {
+    	// Check if media is mounted or storage is built-in, if so, try and use external cache dir
+    	// otherwise use internal cache dir
+    	return Utils.hasExternalStorage() || !Utils.isExternalStorageRemovable() ?
+    					Utils.getExternalCacheDir(context) : context.getCacheDir();
     }
 
     /**
