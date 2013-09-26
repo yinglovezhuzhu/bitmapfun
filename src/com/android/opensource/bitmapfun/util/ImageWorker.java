@@ -188,8 +188,8 @@ public abstract class ImageWorker {
         		error.printStackTrace();
         		if(mImageCache != null) {
         			mImageCache.cleanCaches();
-//        			bitmap = processBitmap(data, config);
-        			bitmap = loadImage(data, config);
+        			bitmap = processBitmap(data, config);
+//        			bitmap = loadImage(data, config);
         		}
         	}
         }
