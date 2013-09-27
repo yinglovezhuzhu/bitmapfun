@@ -53,9 +53,7 @@ public abstract class ImageWorker {
     
     protected ImageWorkerAdapter mImageWorkerAdapter;
     
-    protected OnBitmapSetListener mOnBitmapSetListener;
-    
-    protected OnBitmapLoadedListener mOnBitmapLoadedListener;
+    protected BitmapObserver mBitmapObserver = null;
 
     protected ImageWorker(Context context) {
         mContext = context;
@@ -75,8 +73,10 @@ public abstract class ImageWorker {
      * @param imageView The ImageView to bind the downloaded image to.
      */
     public void loadImage(Object data, ImageView imageView) {
+    	if(mBitmapObserver != null) {
+    		mBitmapObserver.onLoadStart(imageView, data);
+    	}
         Bitmap bitmap = null;
-
         if (mImageCache != null) {
             bitmap = mImageCache.getBitmapFromMemCache(String.valueOf(data));
         }
@@ -111,6 +111,9 @@ public abstract class ImageWorker {
      * @param config
      */
     public void loadImage(Object data, ImageView imageView, Bitmap.Config config) {
+    	if(mBitmapObserver != null) {
+    		mBitmapObserver.onLoadStart(imageView, data);
+    	}
     	Bitmap bitmap = null;
     	
     	if (mImageCache != null) {
@@ -152,6 +155,9 @@ public abstract class ImageWorker {
      */
     public void loadImage(int num, ImageView imageView) {
         if (mImageWorkerAdapter != null) {
+        	if(mBitmapObserver != null) {
+        		mBitmapObserver.onLoadStart(imageView, mImageWorkerAdapter.getItem(num));
+        	}
             loadImage(mImageWorkerAdapter.getItem(num), imageView);
         } else {
             throw new NullPointerException("Data not set, must call setAdapter() first.");
@@ -170,6 +176,9 @@ public abstract class ImageWorker {
      * @return the bitmap
      */
     public Bitmap loadImage(Object data, Bitmap.Config config) {
+    	if(mBitmapObserver != null) {
+    		mBitmapObserver.onLoadStart(null, data);
+    	}
     	Bitmap bitmap = null;
     	String dataString = String.valueOf(data);
         if (mImageCache != null) {
@@ -299,20 +308,13 @@ public abstract class ImageWorker {
     }
     
     /**
-     * Set the listener on bitmap has been set.
-     * @param listener
+     * Set the bitmap observer.
+     * @param observer
      */
-    public void setOnBitmapSetListener(OnBitmapSetListener listener) {
-    	mOnBitmapSetListener = listener;
+    public void setBitmapObserver(BitmapObserver observer) {
+    	this.mBitmapObserver = observer;
     }
     
-    /**
-     * Set the listener on bitmap has loaded.
-     * @param listener
-     */
-    public void setOnBitmapLoadedListener(OnBitmapLoadedListener listener) {
-    	mOnBitmapLoadedListener = listener;
-    }
 
     /**
      * If set to true, the image will fade-in once it has been loaded by the background thread.
@@ -453,7 +455,7 @@ public abstract class ImageWorker {
         	this(imageView);
         	this.mmConfig = config;
         }
-
+        
         /**
          * Background processing.
          */
@@ -509,8 +511,8 @@ public abstract class ImageWorker {
             }
 
             final ImageView imageView = getAttachedImageView();
-            if(mOnBitmapLoadedListener != null) {
-            	mOnBitmapLoadedListener.onBitmapLoaded(imageView, bitmap);
+            if(mBitmapObserver != null) {
+            	mBitmapObserver.onBitmapLoaded(imageView, bitmap);
             }
             if (bitmap != null && imageView != null) {
                 setImageBitmap(imageView, bitmap);
@@ -601,8 +603,8 @@ public abstract class ImageWorker {
     		}
     		
     		final ImageView imageView = getAttachedImageView();
-    		if(mOnBitmapLoadedListener != null) {
-    			mOnBitmapLoadedListener.onBitmapLoaded(imageView, bitmap);
+    		if(mBitmapObserver != null) {
+    			mBitmapObserver.onBitmapLoaded(imageView, bitmap);
     		}
     		if (bitmap != null && imageView != null) {
     			setImageBitmap(imageView, bitmap);
@@ -696,8 +698,8 @@ public abstract class ImageWorker {
         } else {
             imageView.setImageBitmap(bitmap);
         }
-        if(mOnBitmapSetListener != null) {
-        	mOnBitmapSetListener.onBitmapSet(imageView, bitmap);
+        if(mBitmapObserver != null) {
+        	mBitmapObserver.onBitmapSet(imageView, bitmap);
         }
     }
 
@@ -727,11 +729,17 @@ public abstract class ImageWorker {
         public abstract int getSize();
     }
     
-    public static interface OnBitmapSetListener {
-    	public void onBitmapSet(ImageView imageView, Bitmap bitmap);
-    }
-    
-    public static interface OnBitmapLoadedListener {
+    /**
+     * A observer to observe bitmap state.
+     * @author xiaoying
+     *
+     */
+    public static interface BitmapObserver {
+    	
+    	public void onLoadStart(ImageView imageView, Object data);
+    	
     	public void onBitmapLoaded(ImageView imageView, Bitmap bitmap);
+    	
+    	public void onBitmapSet(ImageView imageView, Bitmap bitmap);
     }
 }
