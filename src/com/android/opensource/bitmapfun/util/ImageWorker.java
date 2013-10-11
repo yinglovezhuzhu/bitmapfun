@@ -486,7 +486,11 @@ public abstract class ImageWorker {
             // process method (as implemented by a subclass)
             if (bitmap == null && !isCancelled() && getAttachedImageView() != null
                     && !mExitTasksEarly) {
-                bitmap = processBitmap(params[0], mmConfig);
+            	try {
+            		bitmap = processBitmap(params[0], mmConfig);
+            	} catch (OutOfMemoryError e) {
+            		e.printStackTrace();
+            	}
             }
 
             // If the bitmap was processed and the image cache is available, then add the processed
