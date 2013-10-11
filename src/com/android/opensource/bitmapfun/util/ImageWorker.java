@@ -197,7 +197,7 @@ public abstract class ImageWorker {
         		error.printStackTrace();
         		if(mImageCache != null) {
         			mImageCache.cleanCaches();
-        			bitmap = processBitmap(data, config);
+//        			bitmap = processBitmap(data, config);
 //        			bitmap = loadImage(data, config);
         		}
         	}
@@ -233,7 +233,7 @@ public abstract class ImageWorker {
          		if(mImageCache != null) {
          			mImageCache.cleanMemCache();
          		}
-         		bitmap = createImage(data, width, height, config);
+//         		bitmap = createImage(data, width, height, config);
          	}
     	 }
     	 if (bitmap != null && mImageCache != null) {
@@ -476,7 +476,7 @@ public abstract class ImageWorker {
             	} catch (OutOfMemoryError error) {
             		error.printStackTrace();
             		mImageCache.cleanMemCache();
-            		bitmap = mImageCache.getBitmapFromDiskCache(dataString, mmConfig);
+//            		bitmap = mImageCache.getBitmapFromDiskCache(dataString, mmConfig);
             	}
             }
 
