@@ -78,7 +78,6 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
         mImageWorker.setAdapter(Images.imageThumbWorkerUrlsAdapter);
         mImageWorker.setImageCache(ImageCache.findOrCreateCache(this, cachePath, IMAGE_CACHE_DIR));
         mImageWorker.setImageFadeIn(false);
-
         // Set up ViewPager and backing adapter
         mAdapter = new ImagePagerAdapter(getSupportFragmentManager(),
                 mImageWorker.getAdapter().getSize());

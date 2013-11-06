@@ -148,6 +148,22 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
     public void onResume() {
         super.onResume();
         mImageWorker.setExitTasksEarly(false);
+        File cachePath = null;
+        if(Utils.hasExternalStorage()) {
+        	File appRoot = new File(Environment.getExternalStorageDirectory(), "BitmapFun");
+        	cachePath = new File(appRoot, ".cache");
+        }
+        ImageCacheParams cacheParams = new ImageCacheParams(cachePath, IMAGE_CACHE_DIR);
+
+        // Allocate a third of the per-app memory limit to the bitmap memory cache. This value
+        // should be chosen carefully based on a number of factors. Refer to the corresponding
+        // Android Training class for more discussion:
+        // http://developer.android.com/training/displaying-bitmaps/
+        // In this case, we aren't using memory for much else other than this activity and the
+        // ImageDetailActivity so a third lets us keep all our sample image thumbnails in memory
+        // at once.
+        cacheParams.memCacheSize = 1024 * 1024 * Utils.getMemoryClass(getActivity()) / 3;
+        mImageWorker.setImageCache(ImageCache.findOrCreateCache(getActivity(), cacheParams));
         mAdapter.notifyDataSetChanged();
     }
 
