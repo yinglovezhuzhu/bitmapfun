@@ -81,9 +81,12 @@ public abstract class ImageWorker {
             bitmap = mImageCache.getBitmapFromMemCache(String.valueOf(data));
         }
 
-        if (bitmap != null) {
+        if (bitmap != null && !bitmap.isRecycled()) {
             // Bitmap found in memory cache
             imageView.setImageBitmap(bitmap);
+            if(mBitmapObserver != null) {
+            	mBitmapObserver.onBitmapSet(imageView, bitmap);
+            }
         } else if (cancelPotentialWork(data, imageView)) {
         	if(Build.VERSION.SDK_INT > Build.VERSION_CODES.DONUT && Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
         		final BitmapWorkerTaskEx task = new BitmapWorkerTaskEx(imageView);
@@ -120,9 +123,12 @@ public abstract class ImageWorker {
     		bitmap = mImageCache.getBitmapFromMemCache(String.valueOf(data));
     	}
     	
-    	if (bitmap != null && bitmap.getConfig() == config) {
+    	if (bitmap != null && !bitmap.isRecycled() && bitmap.getConfig() == config) {
     		// Bitmap found in memory cache
     		imageView.setImageBitmap(bitmap);
+    		if(mBitmapObserver != null) {
+            	mBitmapObserver.onBitmapSet(imageView, bitmap);
+            }
     	} else if (cancelPotentialWork(data, imageView)) {
     		if(Build.VERSION.SDK_INT > Build.VERSION_CODES.DONUT && Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
         		final BitmapWorkerTaskEx task = new BitmapWorkerTaskEx(imageView, config);
@@ -189,7 +195,7 @@ public abstract class ImageWorker {
             }
         }
 
-        if (bitmap == null) {
+        if (bitmap == null || !bitmap.isRecycled()) {
         	// Bitmap not found in memory cache and disk cache
         	try {
         		bitmap = processBitmap(data, config);
@@ -224,7 +230,7 @@ public abstract class ImageWorker {
     	 if (mImageCache != null) {
              bitmap = mImageCache.getBitmapFromMemCache(key);
          }
-    	 if(bitmap == null) {
+    	 if(bitmap == null || bitmap.isRecycled()) {
     		 // Create a mutable bitmap.
     		 try {
          		bitmap = Bitmap.createBitmap(width, height, config);
@@ -523,6 +529,14 @@ public abstract class ImageWorker {
             }
         }
 
+    	@Override
+    	protected void onCancelled() {
+    		if(mBitmapObserver != null) {
+    			mBitmapObserver.onBitmapCanceld(mmImageViewReference.get(), mmData);
+    		}
+    		super.onCancelled();
+    	}
+
         /**
          * Returns the ImageView associated with this task as long as the ImageView's task still
          * points to this task as well. Returns null otherwise.
@@ -594,6 +608,14 @@ public abstract class ImageWorker {
     		}
     		
     		return bitmap;
+    	}
+    	
+    	@Override
+    	protected void onCancelled() {
+    		if(mBitmapObserver != null) {
+    			mBitmapObserver.onBitmapCanceld(mmImageViewReference.get(), mmData);
+    		}
+    		super.onCancelled();
     	}
     	
     	/**
@@ -680,7 +702,7 @@ public abstract class ImageWorker {
      * @param bitmap
      */
     private void setImageBitmap(ImageView imageView, Bitmap bitmap) {
-    	if(bitmap == null) {
+    	if(bitmap == null || bitmap.isRecycled()) {
     		//If bitmap is null, set default failed bitmap.
     		bitmap = mLoadFailedBitmap;
     	}
@@ -745,5 +767,7 @@ public abstract class ImageWorker {
     	public void onBitmapLoaded(ImageView imageView, Bitmap bitmap);
     	
     	public void onBitmapSet(ImageView imageView, Bitmap bitmap);
+    	
+    	public void onBitmapCanceld(ImageView imageView, Object data);
     }
 }

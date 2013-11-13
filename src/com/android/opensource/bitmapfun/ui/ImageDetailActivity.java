@@ -100,6 +100,12 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
 					Log.e("AAAAAAAAAAAAAA", "++++++++++ " + bitmap.getWidth() + "<>" + bitmap.getHeight());
 				}
 			}
+
+			@Override
+			public void onBitmapCanceld(ImageView imageView, Object data) {
+				// TODO Auto-generated method stub
+				
+			}
 		});
         
         // Set up ViewPager and backing adapter

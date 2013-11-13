@@ -129,6 +129,12 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
 					Log.e("AAAAAAAAAAAAAA", "++++++++++ " + bitmap.getWidth() + "<>" + bitmap.getHeight());
 				}
 			}
+
+			@Override
+			public void onBitmapCanceld(ImageView imageView, Object data) {
+				// TODO Auto-generated method stub
+				
+			}
 		});
     }
 
