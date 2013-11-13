@@ -196,7 +196,7 @@ public abstract class ImageWorker {
         	} catch (OutOfMemoryError error) {
         		error.printStackTrace();
         		if(mImageCache != null) {
-        			mImageCache.cleanCaches();
+        			mImageCache.cleanMemCache();
 //        			bitmap = processBitmap(data, config);
 //        			bitmap = loadImage(data, config);
         		}
