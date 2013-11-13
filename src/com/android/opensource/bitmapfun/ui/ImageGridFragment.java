@@ -22,6 +22,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -49,6 +50,7 @@ import com.android.opensource.bitmapfun.provider.Images;
 import com.android.opensource.bitmapfun.util.ImageCache;
 import com.android.opensource.bitmapfun.util.ImageCache.ImageCacheParams;
 import com.android.opensource.bitmapfun.util.ImageResizer;
+import com.android.opensource.bitmapfun.util.ImageWorker;
 import com.android.opensource.bitmapfun.util.Utils;
 
 /**
@@ -106,6 +108,28 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
         mImageWorker.setAdapter(Images.imageThumbWorkerUrlsAdapter);
         mImageWorker.setLoadingImage(R.drawable.empty_photo);
         mImageWorker.setImageCache(ImageCache.findOrCreateCache(getActivity(), cacheParams));
+        mImageWorker.setBitmapObserver(new ImageWorker.BitmapObserver() {
+			
+			@Override
+			public void onLoadStart(ImageView imageView, Object data) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onBitmapSet(ImageView imageView, Bitmap bitmap) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onBitmapLoaded(ImageView imageView, Bitmap bitmap) {
+				// TODO Auto-generated method stub
+				if(bitmap != null) {
+					Log.e("AAAAAAAAAAAAAA", "++++++++++ " + bitmap.getWidth() + "<>" + bitmap.getHeight());
+				}
+			}
+		});
     }
 
     @Override

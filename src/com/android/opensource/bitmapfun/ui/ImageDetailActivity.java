@@ -21,6 +21,7 @@ import java.io.File;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -29,6 +30,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -36,6 +38,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager.LayoutParams;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.opensource.bitmapfun.R;
@@ -63,9 +66,6 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
         // activity runs full screen
         final DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        final int height = displaymetrics.heightPixels;
-        final int width = displaymetrics.widthPixels;
-        final int longest = height > width ? height : width;
 
         // The ImageWorker takes care of loading images into our ImageView children asynchronously
 //        mImageWorker = new ImageFetcher(this, longest);
@@ -74,10 +74,34 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
         	File appRoot = new File(Environment.getExternalStorageDirectory(), "BitmapFun");
         	cachePath = new File(appRoot, ".cache");
         }
-        mImageWorker = new ImageResizer(this, longest);
+        mImageWorker = new ImageResizer(this, displaymetrics.widthPixels, displaymetrics.heightPixels);
         mImageWorker.setAdapter(Images.imageThumbWorkerUrlsAdapter);
         mImageWorker.setImageCache(ImageCache.findOrCreateCache(this, cachePath, IMAGE_CACHE_DIR));
         mImageWorker.setImageFadeIn(false);
+        
+        mImageWorker.setBitmapObserver(new ImageWorker.BitmapObserver() {
+			
+			@Override
+			public void onLoadStart(ImageView imageView, Object data) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onBitmapSet(ImageView imageView, Bitmap bitmap) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onBitmapLoaded(ImageView imageView, Bitmap bitmap) {
+				// TODO Auto-generated method stub
+				if(bitmap != null) {
+					Log.e("AAAAAAAAAAAAAA", "++++++++++ " + bitmap.getWidth() + "<>" + bitmap.getHeight());
+				}
+			}
+		});
+        
         // Set up ViewPager and backing adapter
         mAdapter = new ImagePagerAdapter(getSupportFragmentManager(),
                 mImageWorker.getAdapter().getSize());
