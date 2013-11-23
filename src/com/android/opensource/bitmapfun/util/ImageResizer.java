@@ -216,7 +216,8 @@ public class ImageResizer extends ImageWorker {
             // Anything more than 2x the requested pixels we'll sample down
             // further.
 //            final float totalReqPixelsCap = reqWidth * reqHeight * 2;
-            final float totalReqPixelsCap = reqWidth * reqHeight;
+            final float totalReqPixelsCap = reqWidth < reqHeight ? 
+            		reqWidth * (reqWidth * height / width) : (reqHeight * width / height) * reqHeight;
 
             while (totalPixels / (inSampleSize * inSampleSize) > totalReqPixelsCap) {
                 inSampleSize++;
