@@ -204,7 +204,7 @@ public class DiskLruCache {
      * @param key
      * @return
      */
-    public File getBitmapCacheFile(String key) {
+    public File getDiskCacheFile(String key) {
         synchronized (mLinkedHashMap) {
             final String file = mLinkedHashMap.get(key);
             if (file != null) {

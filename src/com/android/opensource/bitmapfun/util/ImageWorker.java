@@ -16,6 +16,7 @@
 
 package com.android.opensource.bitmapfun.util;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 
 import android.content.Context;
@@ -246,6 +247,19 @@ public abstract class ImageWorker {
              mImageCache.addBitmapToMenCache(key, bitmap);
          }
     	return bitmap;
+    }
+    
+    /**
+     * Get disk cache file.
+     * @param data
+     * @return
+     */
+    public File getDiskCacheFile(Object data) {
+    	if(mImageCache == null) {
+    		return null;
+    	}
+    	String dataString = String.valueOf(data);
+    	return mImageCache.getDiskCacheFile(dataString);
     }
     
     /**

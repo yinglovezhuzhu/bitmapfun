@@ -212,6 +212,18 @@ public class ImageCache {
         }
         return null;
     }
+    
+    /**
+     * Get disk cache file.
+     * @param data
+     * @return
+     */
+    public File getDiskCacheFile(String data) {
+    	if(mDiskCache == null) {
+    		return null;
+    	}
+    	return mDiskCache.getDiskCacheFile(data);
+    }
 
     /**
      * Clean caches, both memory cache and disk cache.
