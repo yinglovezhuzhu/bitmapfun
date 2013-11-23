@@ -198,6 +198,34 @@ public class DiskLruCache {
             return null;
         }
     }
+    
+    /**
+     * Get bitmap cache file on disk.
+     * @param key
+     * @return
+     */
+    public File getBitmapCacheFile(String key) {
+        synchronized (mLinkedHashMap) {
+            final String file = mLinkedHashMap.get(key);
+            if (file != null) {
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "Disk cache hit");
+                }
+                return new File(file);
+            } else {
+                final String existingFile = createFilePath(mCacheDir, key);
+                File cacheFile = new File(existingFile);
+                if (cacheFile.exists()) {
+                    put(key, existingFile);
+                    if (BuildConfig.DEBUG) {
+                        Log.d(TAG, "Disk cache hit (existing file)");
+                    }
+                    return cacheFile;
+                }
+            }
+            return null;
+        }
+    }
 
     /**
      * Checks if a specific key exist in the cache.
