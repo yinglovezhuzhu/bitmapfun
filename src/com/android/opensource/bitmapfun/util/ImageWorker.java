@@ -251,8 +251,8 @@ public abstract class ImageWorker {
     
     /**
      * Get disk cache file.
-     * @param data
-     * @return
+     * @param data 
+     * @return disk cache file. null if cache is disable or disk cache is disable.
      */
     public File getDiskCacheFile(Object data) {
     	if(mImageCache == null) {
