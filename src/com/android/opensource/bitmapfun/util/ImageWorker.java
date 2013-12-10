@@ -84,6 +84,9 @@ public abstract class ImageWorker {
 
         if (bitmap != null && !bitmap.isRecycled()) {
             // Bitmap found in memory cache
+        	if(mBitmapObserver != null) {
+        		mBitmapObserver.onBitmapLoaded(imageView, bitmap);
+        	}
             imageView.setImageBitmap(bitmap);
             if(mBitmapObserver != null) {
             	mBitmapObserver.onBitmapSet(imageView, bitmap);
@@ -126,6 +129,9 @@ public abstract class ImageWorker {
     	
     	if (bitmap != null && !bitmap.isRecycled() && bitmap.getConfig() == config) {
     		// Bitmap found in memory cache
+    		if(mBitmapObserver != null) {
+        		mBitmapObserver.onBitmapLoaded(imageView, bitmap);
+        	}
     		imageView.setImageBitmap(bitmap);
     		if(mBitmapObserver != null) {
             	mBitmapObserver.onBitmapSet(imageView, bitmap);
@@ -700,8 +706,7 @@ public abstract class ImageWorker {
     	public AsyncDrawableEx(Resources res, Bitmap bitmap, BitmapWorkerTaskEx bitmapWorkerTask) {
     		super(res, bitmap);
     		
-    		bitmapWorkerTaskReference =
-    				new WeakReference<BitmapWorkerTaskEx>(bitmapWorkerTask);
+    		bitmapWorkerTaskReference = new WeakReference<BitmapWorkerTaskEx>(bitmapWorkerTask);
     	}
     	
     	public BitmapWorkerTaskEx getBitmapWorkerTaskEx() {
