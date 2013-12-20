@@ -91,13 +91,13 @@ public class ImageFetcher extends ImageResizer {
      * @param data The data to load the bitmap, in this case, a regular http URL
      * @return The downloaded and resized bitmap
      */
-    private Bitmap processBitmap(String data, Bitmap.Config config) {
+    private Bitmap processBitmap(String data, Bitmap.Config config, ProgressListener listener) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "processBitmap - " + data);
         }
 
         // Download a bitmap, write it to a file
-        final File f = downloadBitmap(mContext, data);
+        final File f = downloadBitmap(mContext, data, listener);
 
         if (f != null) {
             // Return a sampled down version
@@ -108,8 +108,8 @@ public class ImageFetcher extends ImageResizer {
     }
 
     @Override
-    protected Bitmap processBitmap(Object data,  Bitmap.Config config) {
-        return processBitmap(String.valueOf(data), config);
+    protected Bitmap processBitmap(Object data,  Bitmap.Config config, ProgressListener listener) {
+        return processBitmap(String.valueOf(data), config, listener);
     }
 
     /**
@@ -120,7 +120,7 @@ public class ImageFetcher extends ImageResizer {
      * @param urlString The URL to fetch
      * @return A File pointing to the fetched bitmap
      */
-    public static File downloadBitmap(Context context, String urlString) {
+    public static File downloadBitmap(Context context, String urlString, ProgressListener listener) {
     	
         final File cacheDir = DiskLruCache.getDiskCacheDir(context, mImageCache == null ? 
         		null : mImageCache.getImageCacheParams().cachePath, HTTP_CACHE_DIR);
@@ -136,9 +136,9 @@ public class ImageFetcher extends ImageResizer {
             return cacheFile;
         }
 
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "downloadBitmap - downloading - " + urlString);
-        }
+		if (BuildConfig.DEBUG) {
+			Log.d(TAG, "downloadBitmap - downloading - " + urlString);
+		}
 
         Utils.disableConnectionReuseIfNecessary();
         HttpURLConnection urlConnection = null;
@@ -152,10 +152,35 @@ public class ImageFetcher extends ImageResizer {
             out = new BufferedOutputStream(new FileOutputStream(cacheFile), Utils.IO_BUFFER_SIZE);
 
             int b;
-            while ((b = in.read()) != -1) {
-                out.write(b);
+            long total = urlConnection.getContentLength();
+            long downloaded = 0;
+//			while ((b = in.read()) != -1) {
+//				out.write(b);
+//				downloaded++;
+//				if(listener != null) {
+//					listener.onProgressUpdate(total, downloaded);
+//				}
+//			}
+            long size = total / 100;
+            if(size > 1) {
+            	byte [] buff = new byte[(int) size];
+            	int count = 0;
+            	while((count = in.read(buff)) != -1) {
+            		out.write(buff, 0, count);
+            		downloaded += count;
+            		if(listener != null) {
+            			listener.onProgressUpdate(total, downloaded);
+            		}
+            	}
+            } else {
+            	while ((b = in.read()) != -1) {
+            		out.write(b);
+            		downloaded++;
+            		if(listener != null) {
+            			listener.onProgressUpdate(total, downloaded);
+            		}
+            	}
             }
-
             return cacheFile;
 
         } catch (final IOException e) {

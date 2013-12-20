@@ -44,7 +44,7 @@ import android.widget.Toast;
 import com.android.opensource.bitmapfun.R;
 import com.android.opensource.bitmapfun.provider.Images;
 import com.android.opensource.bitmapfun.util.ImageCache;
-import com.android.opensource.bitmapfun.util.ImageResizer;
+import com.android.opensource.bitmapfun.util.ImageFetcher;
 import com.android.opensource.bitmapfun.util.ImageWorker;
 import com.android.opensource.bitmapfun.util.Utils;
 
@@ -54,7 +54,7 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
     public static final String EXTRA_IMAGE = "extra_image";
 
     private ImagePagerAdapter mAdapter;
-    private ImageResizer mImageWorker;
+    private ImageWorker mImageWorker;
     private ViewPager mPager;
 
     @Override
@@ -68,14 +68,14 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
 
         // The ImageWorker takes care of loading images into our ImageView children asynchronously
-//        mImageWorker = new ImageFetcher(this, longest);
+        mImageWorker = new ImageFetcher(this, displaymetrics.widthPixels, displaymetrics.heightPixels);
         File cachePath = null;
         if(Utils.hasExternalStorage()) {
         	File appRoot = new File(Environment.getExternalStorageDirectory(), "BitmapFun");
         	cachePath = new File(appRoot, ".cache");
         }
-        mImageWorker = new ImageResizer(this, displaymetrics.widthPixels, displaymetrics.heightPixels);
-        mImageWorker.setAdapter(Images.imageThumbWorkerUrlsAdapter);
+//        mImageWorker = new ImageResizer(this, displaymetrics.widthPixels, displaymetrics.heightPixels);
+        mImageWorker.setAdapter(Images.imageWorkerUrlsAdapter);
         mImageWorker.setImageCache(ImageCache.findOrCreateCache(this, cachePath, IMAGE_CACHE_DIR));
         mImageWorker.setImageFadeIn(false);
         

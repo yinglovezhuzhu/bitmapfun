@@ -49,6 +49,7 @@ import com.android.opensource.bitmapfun.R;
 import com.android.opensource.bitmapfun.provider.Images;
 import com.android.opensource.bitmapfun.util.ImageCache;
 import com.android.opensource.bitmapfun.util.ImageCache.ImageCacheParams;
+import com.android.opensource.bitmapfun.util.ImageFetcher;
 import com.android.opensource.bitmapfun.util.ImageResizer;
 import com.android.opensource.bitmapfun.util.ImageWorker;
 import com.android.opensource.bitmapfun.util.Utils;
@@ -79,7 +80,7 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        Images.imageThumbUrls = getImages();
+//        Images.imageThumbUrls = getImages();
         
         mImageThumbSize = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_size);
         mImageThumbSpacing = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_spacing);
@@ -103,8 +104,8 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
         cacheParams.memCacheSize = 1024 * 1024 * Utils.getMemoryClass(getActivity()) / 3;
 
         // The ImageWorker takes care of loading images into our ImageView children asynchronously
-//        mImageWorker = new ImageFetcher(getActivity(), mImageThumbSize);
-        mImageWorker = new ImageResizer(getActivity(), mImageThumbSize);
+        mImageWorker = new ImageFetcher(getActivity(), mImageThumbSize);
+//        mImageWorker = new ImageResizer(getActivity(), mImageThumbSize);
         mImageWorker.setAdapter(Images.imageThumbWorkerUrlsAdapter);
         mImageWorker.setLoadingImage(R.drawable.empty_photo);
         mImageWorker.setImageCache(ImageCache.findOrCreateCache(getActivity(), cacheParams));

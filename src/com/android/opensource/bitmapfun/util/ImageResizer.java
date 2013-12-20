@@ -108,7 +108,7 @@ public class ImageResizer extends ImageWorker {
     }
 
     @Override
-    protected Bitmap processBitmap(Object data, Bitmap.Config config) {
+    protected Bitmap processBitmap(Object data, Bitmap.Config config, ProgressListener listener) {
     	if(data instanceof Integer) {
     		return processBitmap(Integer.parseInt(String.valueOf(data)), config);
     	} else if(data instanceof String) {
