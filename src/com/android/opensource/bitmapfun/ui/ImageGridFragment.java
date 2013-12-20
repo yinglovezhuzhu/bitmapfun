@@ -357,7 +357,8 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
         }
     }
     
-    private String [] getImages() {
+    @SuppressWarnings("unused")
+	private String [] getImages() {
     	ContentResolver cr = getActivity().getContentResolver();
     	Cursor cursor = MediaStore.Images.Media.query(cr, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String [] {MediaStore.MediaColumns.DATA, });
     	if(cursor != null) {
