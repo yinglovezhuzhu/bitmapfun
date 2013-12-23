@@ -28,11 +28,13 @@ public class Images {
      * used to fetch the URLs.
      */
     public final static String[] imageUrls = new String[] {
-        "http://images.55bbs.com/55shuoimg/pic/68/e9/e8/68e9e897d294187346ee3a05edce4580610x14989.jpg",
+        "http://img3.fengniao.com/forum/attachpics/666/176/26635081.jpg",
         "http://desk.blueidea.com/DESK/QTBZ/dwbz/dwbz010.jpg",
-        "http://images.55bbs.com/55shuoimg/pic/46/9b/16/469b167bc825e00fd53b5371f6c598e8610x14989.jpg",
+        "http://img3.fengniao.com/forum/attachpics/666/176/26635078.jpg",
         "http://www.ii123.com/uploads/allimg/c121123/1353A261D0460-410C.jpg",
-        "http://images.55bbs.com/55shuoimg/pic/7e/d2/28/7ed22873027c429a28ae702b19fce17b610x14989.jpg", 
+        "http://img3.fengniao.com/forum/attachpics/666/176/26635077.jpg", 
+        "http://preview.quanjing.com/chineseview037/mhrf-cpmh-19218.jpg", 
+        "http://img3.fengniao.com/forum/attachpics/666/176/26635082.jpg", 
     };
 
     /**

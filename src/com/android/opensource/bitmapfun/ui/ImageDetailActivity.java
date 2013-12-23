@@ -39,6 +39,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.opensource.bitmapfun.R;
@@ -106,6 +107,17 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
 				// TODO Auto-generated method stub
 				
 			}
+
+			@Override
+			public void onProgressUpdate(ProgressBar progressBar, Object url,
+					long total, long downloaded) {
+				// TODO Auto-generated method stub
+				if(total < 1) {
+					Log.i("Progress", url + "<unknown size>");
+					return;
+				}
+				Log.i("Progress", "Progress ====>>>> " + (downloaded * 100/ total) + "%");
+			}
 		});
         
         // Set up ViewPager and backing adapter
@@ -164,7 +176,7 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
             case R.id.clear_cache:
                 final ImageCache cache = mImageWorker.getImageCache();
                 if (cache != null) {
-//                    mImageWorker.getImageCache().cleanCaches();
+                    mImageWorker.getImageCache().cleanCaches();
                     mImageWorker.getImageCache().cleanDiskCache();
 //                    DiskLruCache.clearCache(this, cache.getImageCacheParams().cachePath, IMAGE_CACHE_DIR);
                     Toast.makeText(this, R.string.clear_cache_complete,

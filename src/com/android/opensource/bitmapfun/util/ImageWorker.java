@@ -30,6 +30,7 @@ import android.graphics.drawable.TransitionDrawable;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.android.opensource.bitmapfun.BuildConfig;
 
@@ -71,9 +72,9 @@ public abstract class ImageWorker {
      * @param data The URL of the image to download.
      * @param isNative The data is native or not, true is native, false is Internet.
      * @param imageView The ImageView to bind the downloaded image to.
-     * @param listener Loading progress call back,only for download bitmap.
+     * @param progressBar Loading progress call back,only for download bitmap.
      */
-    public void loadImage(Object data, ImageView imageView, ProgressListener listener) {
+    public void loadImage(Object data, ImageView imageView, ProgressBar progressBar) {
     	if(mBitmapObserver != null) {
     		mBitmapObserver.onLoadStart(imageView, data);
     	}
@@ -92,7 +93,7 @@ public abstract class ImageWorker {
             	mBitmapObserver.onBitmapSet(imageView, bitmap);
             }
         } else if (cancelPotentialWork(data, imageView)) {
-        	final BitmapWorkerTask task = new BitmapWorkerTask(imageView, listener);
+        	final BitmapWorkerTask task = new BitmapWorkerTask(imageView, progressBar);
         	final AsyncDrawable asyncDrawable =
         			new AsyncDrawable(mContext.getResources(), mLoadingBitmap, task);
         	imageView.setImageDrawable(asyncDrawable);
@@ -118,6 +119,23 @@ public abstract class ImageWorker {
     }
 
     /**
+     * 
+     * Load an image specified from a set adapter into an ImageView (override
+     * {@link ImageWorker#processBitmap(Object)} to define the processing logic). A memory and disk
+     * cache will be used if an {@link ImageCache} has been set using
+     * {@link ImageWorker#setImageCache(ImageCache)}. If the image is found in the memory cache, it
+     * is set immediately, otherwise an {@link AsyncTask} will be created to asynchronously load the
+     * bitmap. {@link ImageWorker#setAdapter(ImageWorkerAdapter)} must be called before using this
+     * method.
+     *
+     * @param num The URL index of the image to download.
+     * @param imageView The ImageView to bind the downloaded image to.
+     */
+    public void loadImage(int num, ImageView imageView) {
+    	loadImage(num, imageView, null);
+    }
+    
+    /**
      * Load an image specified by the data parameter.
      * A memory and disk cache will be used if an {@link ImageCache} has been set using
      * {@link ImageWorker#setImageCache(ImageCache)}. If the image is not found in the memory or disk cache, it
@@ -125,9 +143,9 @@ public abstract class ImageWorker {
      * @param data
      * @param imageView
      * @param config
-     * @param listener Loading progress call back,only for download bitmap.
+     * @param progressBar Loading progress call back,only for download bitmap.
      */
-    public void loadImage(Object data, ImageView imageView, Bitmap.Config config, ProgressListener listener) {
+    public void loadImage(Object data, ImageView imageView, Bitmap.Config config, ProgressBar progressBar) {
     	if(mBitmapObserver != null) {
     		mBitmapObserver.onLoadStart(imageView, data);
     	}
@@ -147,7 +165,7 @@ public abstract class ImageWorker {
             	mBitmapObserver.onBitmapSet(imageView, bitmap);
             }
     	} else if (cancelPotentialWork(data, imageView)) {
-    		final BitmapWorkerTask task = new BitmapWorkerTask(imageView, config, listener);
+    		final BitmapWorkerTask task = new BitmapWorkerTask(imageView, config, progressBar);
     		final AsyncDrawable asyncDrawable =
     				new AsyncDrawable(mContext.getResources(), mLoadingBitmap, task);
     		imageView.setImageDrawable(asyncDrawable);
@@ -180,14 +198,14 @@ public abstract class ImageWorker {
      *
      * @param num The URL index of the image to download.
      * @param imageView The ImageView to bind the downloaded image to.
-     * @param listener Loading progress call back,only for download bitmap.
+     * @param progressBar Loading progress call back,only for download bitmap.
      */
-    public void loadImage(int num, ImageView imageView, ProgressListener listener) {
+    public void loadImage(int num, ImageView imageView, ProgressBar progressBar) {
         if (mImageWorkerAdapter != null) {
         	if(mBitmapObserver != null) {
         		mBitmapObserver.onLoadStart(imageView, mImageWorkerAdapter.getItem(num));
         	}
-            loadImage(mImageWorkerAdapter.getItem(num), imageView, listener);
+            loadImage(mImageWorkerAdapter.getItem(num), imageView, progressBar);
         } else {
             throw new NullPointerException("Data not set, must call setAdapter() first.");
         }
@@ -202,11 +220,11 @@ public abstract class ImageWorker {
      *
      * @param data The URL of the image to download.
      * @param config The config of bitmap
-     * @param listener Loading progress call back,only for download bitmap.
+     * @param progressBar Loading progress call back,only for download bitmap.
      * 
      * @return the bitmap
      */
-    public Bitmap loadImage(Object data, Bitmap.Config config, ProgressListener listener) {
+    public Bitmap loadImage(Object data, Bitmap.Config config, ProgressBar progressBar) {
     	if(mBitmapObserver != null) {
     		mBitmapObserver.onLoadStart(null, data);
     	}
@@ -223,7 +241,7 @@ public abstract class ImageWorker {
         if (bitmap == null || !bitmap.isRecycled()) {
         	// Bitmap not found in memory cache and disk cache
         	try {
-        		bitmap = processBitmap(data, config, listener);
+        		bitmap = processBitmap(data, config, progressBar);
         	} catch (OutOfMemoryError error) {
         		error.printStackTrace();
         		if(mImageCache != null) {
@@ -398,8 +416,7 @@ public abstract class ImageWorker {
      * 
      * @return The processed bitmap
      */
-    protected abstract Bitmap processBitmap(Object data, Bitmap.Config config, ProgressListener listener);
-//    protected abstract Bitmap processBitmap(Object data, Bitmap.Config config);
+    protected abstract Bitmap processBitmap(Object data, Bitmap.Config config, ProgressBar progressBar);
     
     
     public static void cancelWork(ImageView imageView) {
@@ -461,16 +478,16 @@ public abstract class ImageWorker {
         private Object mmData;
         private final WeakReference<ImageView> mmImageViewReference;
         private Bitmap.Config mmConfig = Bitmap.Config.ARGB_8888;
-        private ProgressListener mmProgressListener;
+        private ProgressBar mmProgressBar;
 
-        public BitmapWorkerTask(ImageView imageView, ProgressListener listener) {
+        public BitmapWorkerTask(ImageView imageView, ProgressBar progressBar) {
         	imageView.setImageBitmap(mLoadingBitmap);
             mmImageViewReference = new WeakReference<ImageView>(imageView);
-            this.mmProgressListener = listener;
+            this.mmProgressBar = progressBar;
         }
         
-        public BitmapWorkerTask(ImageView imageView, Bitmap.Config config, ProgressListener listener) {
-        	this(imageView, listener);
+        public BitmapWorkerTask(ImageView imageView, Bitmap.Config config, ProgressBar progressBar) {
+        	this(imageView, progressBar);
         	this.mmConfig = config;
         }
         
@@ -505,7 +522,7 @@ public abstract class ImageWorker {
             if (bitmap == null && !isCancelled() && getAttachedImageView() != null
                     && !mExitTasksEarly) {
             	try {
-            		bitmap = processBitmap(params[0], mmConfig, mmProgressListener);
+            		bitmap = processBitmap(params[0], mmConfig, mmProgressBar);
             	} catch (OutOfMemoryError e) {
             		e.printStackTrace();
             	}
@@ -653,21 +670,24 @@ public abstract class ImageWorker {
     	
     	public void onLoadStart(ImageView imageView, Object data);
     	
+    	/**
+    	 * This call back method only for download bitmap from the Internet.
+    	 * @param progressBar 需要展示进度的进度条，在{@link ImageWorker#loadImage(int, ImageView, ProgressBar)}<br>
+    	 * 或者{@link ImageWorker#loadImage(Object, android.graphics.Bitmap.Config, ProgressBar)}、<br>
+    	 * {@link ImageWorker#loadImage(Object, ImageView, ProgressBar)}、<br>
+    	 * {@link ImageWorker#loadImage(Object, ImageView, android.graphics.Bitmap.Config, ProgressBar)}等<br>
+    	 * 带有ProgressBar的loadImage()方法中传入，如果不穿或者传空，将无法在进度条中展示进度或者出现进度错乱的问题。
+    	 * @param url The URL of the bitmap.
+    	 * @param total The total size of the downloading bitmap.<br>
+    	 * return the download file total size or -1 unknown size.
+    	 * @param downloaded The downloaded size of the downloading bitmap.
+    	 */
+    	public void onProgressUpdate(ProgressBar progressBar, Object url, long total, long downloaded);
+    	
     	public void onBitmapLoaded(ImageView imageView, Bitmap bitmap);
     	
     	public void onBitmapSet(ImageView imageView, Bitmap bitmap);
     	
     	public void onBitmapCanceld(ImageView imageView, Object data);
-    }
-    
-
-    /**
-     * A interface to update progress.<br>
-     * <p>Just for download bitmap.
-     * @author xiaoying
-     *
-     */
-    public static interface ProgressListener {
-    	public void onProgressUpdate(Long... progress);
     }
 }

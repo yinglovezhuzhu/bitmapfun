@@ -30,6 +30,7 @@ import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.opensource.bitmapfun.BuildConfig;
@@ -39,8 +40,10 @@ import com.android.opensource.bitmapfun.BuildConfig;
  */
 public class ImageFetcher extends ImageResizer {
     private static final String TAG = "ImageFetcher";
+    private static final int DEFAULT_BUFF_SIZE = 1024 * 8; //8KB
     private static final int HTTP_CACHE_SIZE = 10 * 1024 * 1024; // 10MB
     public static final String HTTP_CACHE_DIR = "http";
+    
 
     /**
      * Initialize providing a target image width and height for the processing images.
@@ -91,13 +94,13 @@ public class ImageFetcher extends ImageResizer {
      * @param data The data to load the bitmap, in this case, a regular http URL
      * @return The downloaded and resized bitmap
      */
-    private Bitmap processBitmap(String data, Bitmap.Config config, ProgressListener listener) {
+    private Bitmap processBitmap(String data, Bitmap.Config config, ProgressBar progressBar) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "processBitmap - " + data);
         }
 
         // Download a bitmap, write it to a file
-        final File f = downloadBitmap(mContext, data, listener);
+        final File f = downloadBitmap(mContext, data, mBitmapObserver, progressBar);
 
         if (f != null) {
             // Return a sampled down version
@@ -108,8 +111,8 @@ public class ImageFetcher extends ImageResizer {
     }
 
     @Override
-    protected Bitmap processBitmap(Object data,  Bitmap.Config config, ProgressListener listener) {
-        return processBitmap(String.valueOf(data), config, listener);
+    protected Bitmap processBitmap(Object data,  Bitmap.Config config, ProgressBar progressBar) {
+        return processBitmap(String.valueOf(data), config, progressBar);
     }
 
     /**
@@ -120,7 +123,7 @@ public class ImageFetcher extends ImageResizer {
      * @param urlString The URL to fetch
      * @return A File pointing to the fetched bitmap
      */
-    public static File downloadBitmap(Context context, String urlString, ProgressListener listener) {
+    public static File downloadBitmap(Context context, String urlString, BitmapObserver observer, ProgressBar progressBar) {
     	
         final File cacheDir = DiskLruCache.getDiskCacheDir(context, mImageCache == null ? 
         		null : mImageCache.getImageCacheParams().cachePath, HTTP_CACHE_DIR);
@@ -143,46 +146,68 @@ public class ImageFetcher extends ImageResizer {
         Utils.disableConnectionReuseIfNecessary();
         HttpURLConnection urlConnection = null;
         BufferedOutputStream out = null;
-
         try {
             final URL url = new URL(urlString);
             urlConnection = (HttpURLConnection) url.openConnection();
-            final InputStream in =
-                    new BufferedInputStream(urlConnection.getInputStream(), Utils.IO_BUFFER_SIZE);
-            out = new BufferedOutputStream(new FileOutputStream(cacheFile), Utils.IO_BUFFER_SIZE);
+            urlConnection.setConnectTimeout(5 * 1000);
+            urlConnection.setRequestMethod("GET");
+            urlConnection.setRequestProperty("Accept", "*/*");
+            urlConnection.setRequestProperty("Referer", urlString);
+    		// 设置用户代理
+            urlConnection.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; "
+    				+ "MSIE 8.0; Windows NT 5.2;"
+    				+ " Trident/4.0; .NET CLR 1.1.4322;"
+    				+ ".NET CLR 2.0.50727; " + ".NET CLR 3.0.04506.30;"
+    				+ " .NET CLR 3.0.4506.2152; " + ".NET CLR 3.5.30729)");
+            urlConnection.connect();
+            if(urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            	final InputStream in =
+                        new BufferedInputStream(urlConnection.getInputStream(), Utils.IO_BUFFER_SIZE);
+                out = new BufferedOutputStream(new FileOutputStream(cacheFile), Utils.IO_BUFFER_SIZE);
 
-            int b;
-            long total = urlConnection.getContentLength();
-            long downloaded = 0;
-//			while ((b = in.read()) != -1) {
-//				out.write(b);
-//				downloaded++;
-//				if(listener != null) {
-//					listener.onProgressUpdate(total, downloaded);
-//				}
-//			}
-            long size = total / 100;
-            if(size > 1) {
-            	byte [] buff = new byte[(int) size];
-            	int count = 0;
-            	while((count = in.read(buff)) != -1) {
-            		out.write(buff, 0, count);
-            		downloaded += count;
-            		if(listener != null) {
-            			listener.onProgressUpdate(total, downloaded);
-            		}
-            	}
+                int b;
+                long total = urlConnection.getContentLength();
+                if(total < 0) {
+                	urlConnection.connect();
+                	total = urlConnection.getContentLength();
+                }
+                long downloaded = 0;
+                if(total < 0) {
+                	byte [] buff = new byte[DEFAULT_BUFF_SIZE];
+                	int count = 0;
+                	while((count = in.read(buff)) != -1) {
+                		out.write(buff, 0, count);
+                		downloaded += count;
+                		if(observer != null) {
+                			observer.onProgressUpdate(progressBar, urlString, total, downloaded);
+                		}
+                	}
+                } else {
+                	long size = total / 100;
+                    if(size > 1) {
+                    	byte [] buff = new byte[(int) size];
+                    	int count = 0;
+                    	while((count = in.read(buff)) != -1) {
+                    		out.write(buff, 0, count);
+                    		downloaded += count;
+                    		if(observer != null) {
+                    			observer.onProgressUpdate(progressBar, urlString, total, downloaded);
+                    		}
+                    	}
+                    } else {
+                    	while ((b = in.read()) != -1) {
+                    		out.write(b);
+                    		downloaded++;
+                    		if(observer != null) {
+                    			observer.onProgressUpdate(progressBar, urlString, total, downloaded);
+                    		}
+                    	}
+                    }
+                }
+                return cacheFile;
             } else {
-            	while ((b = in.read()) != -1) {
-            		out.write(b);
-            		downloaded++;
-            		if(listener != null) {
-            			listener.onProgressUpdate(total, downloaded);
-            		}
-            	}
+            	return null;
             }
-            return cacheFile;
-
         } catch (final IOException e) {
             Log.e(TAG, "Error in downloadBitmap - " + e);
         } finally {

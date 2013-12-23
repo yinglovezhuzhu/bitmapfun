@@ -85,16 +85,7 @@ public class ImageDetailFragment extends Fragment {
         // cache can be used over all pages in the ViewPager
         if (ImageDetailActivity.class.isInstance(getActivity())) {
             mImageWorker = ((ImageDetailActivity) getActivity()).getImageWorker();
-            mImageWorker.loadImage(mImageNum, mImageView, new ImageWorker.ProgressListener() {
-				
-				@Override
-				public void onProgressUpdate(Long... progress) {
-					if(progress == null || progress.length < 2) {
-						return;
-					}
-					System.out.println((progress[1] * 100 / progress[0]) + "%");
-				}
-			});
+            mImageWorker.loadImage(mImageNum, mImageView, null);
         }
 
         // Pass clicks on the ImageView to the parent activity to handle

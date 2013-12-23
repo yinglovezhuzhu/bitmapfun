@@ -42,6 +42,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.opensource.bitmapfun.BuildConfig;
@@ -133,6 +134,12 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
 
 			@Override
 			public void onBitmapCanceld(ImageView imageView, Object data) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onProgressUpdate(ProgressBar progressBar, Object url, long totle, long downloaded) {
 				// TODO Auto-generated method stub
 				
 			}
