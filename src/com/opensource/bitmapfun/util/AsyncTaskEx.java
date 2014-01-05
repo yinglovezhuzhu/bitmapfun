@@ -13,7 +13,7 @@
 	limitations under the License.
 */		
 
-package com.android.opensource.bitmapfun.util;
+package com.opensource.bitmapfun.util;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;

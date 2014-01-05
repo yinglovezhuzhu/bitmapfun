@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.opensource.bitmapfun.util;
+package com.opensource.bitmapfun.util;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -36,7 +36,7 @@ import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import com.android.opensource.bitmapfun.BuildConfig;
+import com.opensource.bitmapfun.BuildConfig;
 
 /**
  * A simple disk LRU bitmap cache to illustrate how a disk cache would be used for bitmap caching. A

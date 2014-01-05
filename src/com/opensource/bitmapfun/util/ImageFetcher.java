@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.opensource.bitmapfun.util;
+package com.opensource.bitmapfun.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -33,7 +33,7 @@ import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.android.opensource.bitmapfun.BuildConfig;
+import com.opensource.bitmapfun.BuildConfig;
 
 /**
  * A simple subclass of {@link ImageResizer} that fetches and resizes images fetched from a URL.

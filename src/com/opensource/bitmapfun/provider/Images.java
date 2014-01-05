@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.android.opensource.bitmapfun.provider;
+package com.opensource.bitmapfun.provider;
 
-import com.android.opensource.bitmapfun.util.ImageWorker.ImageWorkerAdapter;
+import com.opensource.bitmapfun.util.ImageWorker.ImageWorkerAdapter;
 
 /**
  * Some simple test data to use for this sample app.

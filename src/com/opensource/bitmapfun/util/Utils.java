@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.opensource.bitmapfun.util;
+package com.opensource.bitmapfun.util;
 
 import java.io.File;
 

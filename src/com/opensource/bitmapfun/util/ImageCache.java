@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.opensource.bitmapfun.util;
+package com.opensource.bitmapfun.util;
 
 import java.io.File;
 
@@ -25,7 +25,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.util.LruCache;
 import android.util.Log;
 
-import com.android.opensource.bitmapfun.BuildConfig;
+import com.opensource.bitmapfun.BuildConfig;
 
 /**
  * This class holds our bitmap caches (memory and disk).

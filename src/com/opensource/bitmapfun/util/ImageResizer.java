@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.opensource.bitmapfun.util;
+package com.opensource.bitmapfun.util;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -23,7 +23,7 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.widget.ProgressBar;
 
-import com.android.opensource.bitmapfun.BuildConfig;
+import com.opensource.bitmapfun.BuildConfig;
 
 /**
  * A simple subclass of {@link ImageWorker} that resizes images from resources given a target width

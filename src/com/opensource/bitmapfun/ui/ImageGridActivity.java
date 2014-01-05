@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.opensource.bitmapfun.ui;
+package com.opensource.bitmapfun.ui;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;

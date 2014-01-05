@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.opensource.bitmapfun.ui;
+package com.opensource.bitmapfun.ui;
 
 import java.io.File;
 
@@ -42,12 +42,12 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.android.opensource.bitmapfun.R;
-import com.android.opensource.bitmapfun.provider.Images;
-import com.android.opensource.bitmapfun.util.ImageCache;
-import com.android.opensource.bitmapfun.util.ImageFetcher;
-import com.android.opensource.bitmapfun.util.ImageWorker;
-import com.android.opensource.bitmapfun.util.Utils;
+import com.opensource.bitmapfun.R;
+import com.opensource.bitmapfun.provider.Images;
+import com.opensource.bitmapfun.util.ImageCache;
+import com.opensource.bitmapfun.util.ImageFetcher;
+import com.opensource.bitmapfun.util.ImageWorker;
+import com.opensource.bitmapfun.util.Utils;
 
 @SuppressLint("NewApi")
 public class ImageDetailActivity extends FragmentActivity implements OnClickListener {
