@@ -105,6 +105,9 @@ public class ImageResizer extends ImageWorker {
     	if (BuildConfig.DEBUG) {
     		Log.d(TAG, "processBitmap - " + data);
     	}
+    	if(data == null || data.length() < 1) {
+    		return null;
+    	}
     	return decodeSampledBitmapFromFile(data, mImageWidth, mImageHeight, config);
     }
 
