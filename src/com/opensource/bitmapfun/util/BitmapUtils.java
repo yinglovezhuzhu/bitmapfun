@@ -117,28 +117,45 @@ public class BitmapUtils {
 		return new Size(options.outWidth, options.outHeight);
 	}
 	
-	public static Bitmap toRoundCorner(Bitmap bitmap, float pixels) {
-		Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
-				bitmap.getHeight(), Config.ARGB_8888);
+
+
+	/**
+	 * Make a round corner bitmap
+	 * 
+	 * @param bitmap
+	 *            Source bitmap.
+	 * @param ratio
+	 *            Corner radius ratio of Diameter accounting. when it's value is 2,
+	 *            the bitmap which returned is a circle.
+	 * @return the round corner bitmap. null if input bitmap is invalid.
+	 */
+	public static Bitmap toRoundCorner(Bitmap bitmap, int ratio) {
+		int width = bitmap.getWidth();
+		int height = bitmap.getHeight();
+		if (width <= 0 || height <= 0) {
+			return null;
+		}
+		int diameter = width > height ? height : width; // Get the diameter(The
+														// smallest edge)
+
+		Bitmap output = Bitmap.createBitmap(diameter, diameter, Config.ARGB_8888); // Create an output bitmap.
 		Canvas canvas = new Canvas(output);
 
-		final int color = 0xff424242;
 		final Paint paint = new Paint();
-		final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-		final RectF rectF = new RectF(rect);
-		final float roundPx = pixels;
+		final int x = (width - diameter) / 2;
+		final int y = (height - diameter) / 2;
+		final Rect srcRect = new Rect(x, y, x + diameter, y + diameter); // Center part of the source bitmap.
+		final Rect destRect = new Rect(0, 0, diameter, diameter);
 
 		paint.setAntiAlias(true);
-		canvas.drawARGB(0, 0, 0, 0);
 
-		paint.setColor(color);
-		canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+		float r = (float) diameter / ratio;
+		canvas.drawRoundRect(new RectF(destRect), r, r, paint);
+
 		paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
-		canvas.drawBitmap(bitmap, rect, rect, paint);
-
+		canvas.drawBitmap(bitmap, srcRect, destRect, paint);
 		return output;
 	}
-	
 	
 	public static class Size {
 		public int width = 0;
@@ -184,42 +201,4 @@ public class BitmapUtils {
 		}
 		
 	}
-
-
-	/**
-		 * Make a round corner bitmap
-		 * 
-		 * @param bitmap
-		 *            Source bitmap.
-		 * @param ratio
-		 *            Corner radius ratio of Diameter accounting. when it's value is 2,
-		 *            the bitmap which returned is a circle.
-		 * @return the round corner bitmap. null if input bitmap is invalid. 
-		 */
-		public static Bitmap toRoundCorner(Bitmap bitmap, int ratio) {
-			int width = bitmap.getWidth();
-			int height = bitmap.getHeight();
-			if(width <= 0 || height <= 0) {
-				return null;
-			}
-			int diameter = width > height ? height : width; //Get the diameter(The smallest edge)
-			
-			Bitmap output = Bitmap.createBitmap(diameter, diameter, Config.ARGB_8888); //Create an output bitmap.
-			Canvas canvas = new Canvas(output);
-	
-			final Paint paint = new Paint();
-			final int x = (width - diameter) / 2;
-			final int y = (height - diameter) / 2;
-			final Rect srcRect = new Rect(x, y, x + diameter, y +diameter); //Center part of the source bitmap.
-			final Rect destRect = new Rect(0, 0, diameter, diameter);
-	
-			paint.setAntiAlias(true);
-			
-			float r = (float) diameter / ratio;
-			canvas.drawRoundRect(new RectF(destRect), r, r, paint);
-	
-			paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
-			canvas.drawBitmap(bitmap, srcRect, destRect, paint);
-			return output;
-		}
 }
