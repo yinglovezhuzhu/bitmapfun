@@ -21,7 +21,6 @@ import java.io.File;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -30,7 +29,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,8 +36,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager.LayoutParams;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.opensource.bitmapfun.R;
@@ -80,45 +76,6 @@ public class ImageDetailActivity extends FragmentActivity implements OnClickList
         mImageWorker.setImageCache(ImageCache.findOrCreateCache(this, cachePath, IMAGE_CACHE_DIR));
         mImageWorker.setImageFadeIn(false);
         
-        mImageWorker.setBitmapObserver(new ImageWorker.BitmapObserver() {
-			
-			@Override
-			public void onLoadStart(ImageView imageView, Object data) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onBitmapSet(ImageView imageView, Bitmap bitmap) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onBitmapLoaded(ImageView imageView, Bitmap bitmap) {
-				// TODO Auto-generated method stub
-				if(bitmap != null) {
-					Log.e("AAAAAAAAAAAAAA", "++++++++++ " + bitmap.getWidth() + "<>" + bitmap.getHeight());
-				}
-			}
-
-			@Override
-			public void onBitmapCanceld(ImageView imageView, Object data) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onProgressUpdate(ProgressBar progressBar, Object url,
-					long total, long downloaded) {
-				// TODO Auto-generated method stub
-				if(total < 1) {
-					Log.i("Progress", url + "<unknown size>");
-					return;
-				}
-				Log.i("Progress", "Progress ====>>>> " + (downloaded * 100/ total) + "%");
-			}
-		});
         
         // Set up ViewPager and backing adapter
         mAdapter = new ImagePagerAdapter(getSupportFragmentManager(),

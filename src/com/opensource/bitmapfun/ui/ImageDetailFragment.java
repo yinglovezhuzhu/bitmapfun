@@ -16,8 +16,10 @@
 
 package com.opensource.bitmapfun.ui;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -85,7 +87,49 @@ public class ImageDetailFragment extends Fragment {
         // cache can be used over all pages in the ViewPager
         if (ImageDetailActivity.class.isInstance(getActivity())) {
             mImageWorker = ((ImageDetailActivity) getActivity()).getImageWorker();
-            mImageWorker.loadImage(mImageNum, mImageView, null);
+            mImageWorker.loadImage(mImageNum, mImageView, new ImageWorker.LoadListener() {
+				
+				@Override
+				public void onStart(ImageView imageView, Object data) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void onSet(ImageView imageView, Bitmap bitmap) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void onProgressUpdate(Object url, long total, long downloaded) {
+					if(total < 1) {
+						Log.i("Progress", url + "<unknown size>");
+						return;
+					}
+					Log.i("AAA", "Progress===========^_^=======>>> " + (downloaded * 100 / total) + "%");
+				}
+				
+				@Override
+				public void onLoaded(ImageView imageView, Bitmap bitmap) {
+					if(bitmap == null) {
+						Log.e("AAA", "Error occured when load image");
+						return;
+					} 
+					Log.i("AAA", "Bitmap loaded=====^_^， size(" + bitmap.getWidth() + "," + bitmap.getHeight() + ")");
+				}
+				
+				@Override
+				public void onError(Object data, Object errorMsg) {
+					Log.e("AAA", "Error" + errorMsg.toString());
+				}
+				
+				@Override
+				public void onCanceld(ImageView imageView, Object data) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
         }
 
         // Pass clicks on the ImageView to the parent activity to handle

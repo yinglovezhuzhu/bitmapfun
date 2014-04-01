@@ -30,7 +30,6 @@ import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.opensource.bitmapfun.BuildConfig;
@@ -94,13 +93,13 @@ public class ImageFetcher extends ImageResizer {
      * @param data The data to load the bitmap, in this case, a regular http URL
      * @return The downloaded and resized bitmap
      */
-    private Bitmap processBitmap(String data, Bitmap.Config config, ProgressBar progressBar) {
+    private Bitmap processBitmap(String data, Bitmap.Config config, LoadListener l) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "processBitmap - " + data);
         }
 
         // Download a bitmap, write it to a file
-        final File f = downloadBitmap(mContext, data, mBitmapObserver, progressBar);
+        final File f = downloadBitmap(mContext, data, l);
 
         if (f != null) {
             // Return a sampled down version
@@ -111,8 +110,8 @@ public class ImageFetcher extends ImageResizer {
     }
 
     @Override
-    protected Bitmap processBitmap(Object data,  Bitmap.Config config, ProgressBar progressBar) {
-        return processBitmap(String.valueOf(data), config, progressBar);
+    protected Bitmap processBitmap(Object data,  Bitmap.Config config, LoadListener l) {
+        return processBitmap(String.valueOf(data), config, l);
     }
 
     /**
@@ -123,7 +122,7 @@ public class ImageFetcher extends ImageResizer {
      * @param urlString The URL to fetch
      * @return A File pointing to the fetched bitmap
      */
-    public static File downloadBitmap(Context context, String urlString, BitmapObserver observer, ProgressBar progressBar) {
+    public static File downloadBitmap(Context context, String urlString, LoadListener l) {
     	
         final File cacheDir = DiskLruCache.getDiskCacheDir(context, mImageCache == null ? 
         		null : mImageCache.getImageCacheParams().cachePath, HTTP_CACHE_DIR);
@@ -178,8 +177,8 @@ public class ImageFetcher extends ImageResizer {
                 	while((count = in.read(buff)) != -1) {
                 		out.write(buff, 0, count);
                 		downloaded += count;
-                		if(observer != null) {
-                			observer.onProgressUpdate(progressBar, urlString, total, downloaded);
+                		if(l != null) {
+                			l.onProgressUpdate(urlString, total, downloaded);
                 		}
                 	}
                 } else {
@@ -190,16 +189,16 @@ public class ImageFetcher extends ImageResizer {
                     	while((count = in.read(buff)) != -1) {
                     		out.write(buff, 0, count);
                     		downloaded += count;
-                    		if(observer != null) {
-                    			observer.onProgressUpdate(progressBar, urlString, total, downloaded);
+                    		if(l != null) {
+                    			l.onProgressUpdate(urlString, total, downloaded);
                     		}
                     	}
                     } else {
                     	while ((b = in.read()) != -1) {
                     		out.write(b);
                     		downloaded++;
-                    		if(observer != null) {
-                    			observer.onProgressUpdate(progressBar, urlString, total, downloaded);
+                    		if(l != null) {
+                    			l.onProgressUpdate(urlString, total, downloaded);
                     		}
                     	}
                     }
@@ -210,6 +209,9 @@ public class ImageFetcher extends ImageResizer {
             }
         } catch (final IOException e) {
             Log.e(TAG, "Error in downloadBitmap - " + e);
+            if(l != null) {
+            	l.onError(urlString, e);
+            }
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -219,6 +221,9 @@ public class ImageFetcher extends ImageResizer {
                     out.close();
                 } catch (final IOException e) {
                     Log.e(TAG, "Error in downloadBitmap - " + e);
+                    if(l != null) {
+                    	l.onError(urlString, e);
+                    }
                 }
             }
         }

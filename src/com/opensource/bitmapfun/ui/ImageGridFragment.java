@@ -22,7 +22,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -42,18 +41,16 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.opensource.bitmapfun.BuildConfig;
 import com.opensource.bitmapfun.R;
 import com.opensource.bitmapfun.provider.Images;
 import com.opensource.bitmapfun.util.ImageCache;
+import com.opensource.bitmapfun.util.ImageCache.ImageCacheParams;
 import com.opensource.bitmapfun.util.ImageFetcher;
 import com.opensource.bitmapfun.util.ImageResizer;
-import com.opensource.bitmapfun.util.ImageWorker;
 import com.opensource.bitmapfun.util.Utils;
-import com.opensource.bitmapfun.util.ImageCache.ImageCacheParams;
 
 /**
  * The main fragment that powers the ImageGridActivity screen. Fairly straight forward GridView
@@ -110,40 +107,6 @@ public class ImageGridFragment extends Fragment implements AdapterView.OnItemCli
         mImageWorker.setAdapter(Images.imageThumbWorkerUrlsAdapter);
         mImageWorker.setLoadingImage(R.drawable.empty_photo);
         mImageWorker.setImageCache(ImageCache.findOrCreateCache(getActivity(), cacheParams));
-        mImageWorker.setBitmapObserver(new ImageWorker.BitmapObserver() {
-			
-			@Override
-			public void onLoadStart(ImageView imageView, Object data) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onBitmapSet(ImageView imageView, Bitmap bitmap) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onBitmapLoaded(ImageView imageView, Bitmap bitmap) {
-				// TODO Auto-generated method stub
-				if(bitmap != null) {
-					Log.e("AAAAAAAAAAAAAA", "++++++++++ " + bitmap.getWidth() + "<>" + bitmap.getHeight());
-				}
-			}
-
-			@Override
-			public void onBitmapCanceld(ImageView imageView, Object data) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onProgressUpdate(ProgressBar progressBar, Object url, long totle, long downloaded) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
     }
 
     @Override

@@ -21,7 +21,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
-import android.widget.ProgressBar;
 
 import com.opensource.bitmapfun.BuildConfig;
 
@@ -112,7 +111,7 @@ public class ImageResizer extends ImageWorker {
     }
 
     @Override
-    protected Bitmap processBitmap(Object data, Bitmap.Config config, ProgressBar progressBar) {
+    protected Bitmap processBitmap(Object data, Bitmap.Config config, LoadListener l) {
     	if(data instanceof Integer) {
     		return processBitmap(Integer.parseInt(String.valueOf(data)), config);
     	} else if(data instanceof String) {

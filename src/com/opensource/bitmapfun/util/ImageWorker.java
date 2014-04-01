@@ -30,7 +30,6 @@ import android.graphics.drawable.TransitionDrawable;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 
 import com.opensource.bitmapfun.BuildConfig;
 
@@ -54,7 +53,7 @@ public abstract class ImageWorker {
     
     protected ImageWorkerAdapter mImageWorkerAdapter;
     
-    protected BitmapObserver mBitmapObserver = null;
+//    protected BitmapObserver mBitmapObserver = null;
 
     protected ImageWorker(Context context) {
         mContext = context;
@@ -72,11 +71,10 @@ public abstract class ImageWorker {
      * @param data The URL of the image to download.
      * @param isNative The data is native or not, true is native, false is Internet.
      * @param imageView The ImageView to bind the downloaded image to.
-     * @param progressBar Loading progress call back,only for download bitmap.
      */
-    public void loadImage(Object data, ImageView imageView, ProgressBar progressBar) {
-    	if(mBitmapObserver != null) {
-    		mBitmapObserver.onLoadStart(imageView, data);
+    public void loadImage(Object data, ImageView imageView, LoadListener l) {
+    	if(l != null) {
+    		l.onStart(imageView, data);
     	}
         Bitmap bitmap = null;
         if (mImageCache != null) {
@@ -85,15 +83,15 @@ public abstract class ImageWorker {
 
         if (bitmap != null && !bitmap.isRecycled()) {
             // Bitmap found in memory cache
-        	if(mBitmapObserver != null) {
-        		mBitmapObserver.onBitmapLoaded(imageView, bitmap);
+        	if(l != null) {
+        		l.onLoaded(imageView, bitmap);
         	}
             imageView.setImageBitmap(bitmap);
-            if(mBitmapObserver != null) {
-            	mBitmapObserver.onBitmapSet(imageView, bitmap);
+            if(l != null) {
+            	l.onSet(imageView, bitmap);
             }
         } else if (cancelPotentialWork(data, imageView)) {
-        	final BitmapWorkerTask task = new BitmapWorkerTask(imageView, progressBar);
+        	final BitmapWorkerTask task = new BitmapWorkerTask(imageView, l);
         	final AsyncDrawable asyncDrawable =
         			new AsyncDrawable(mContext.getResources(), mLoadingBitmap, task);
         	imageView.setImageDrawable(asyncDrawable);
@@ -143,11 +141,10 @@ public abstract class ImageWorker {
      * @param data
      * @param imageView
      * @param config
-     * @param progressBar Loading progress call back,only for download bitmap.
      */
-    public void loadImage(Object data, ImageView imageView, Bitmap.Config config, ProgressBar progressBar) {
-    	if(mBitmapObserver != null) {
-    		mBitmapObserver.onLoadStart(imageView, data);
+    public void loadImage(Object data, ImageView imageView, Bitmap.Config config, LoadListener l) {
+    	if(l != null) {
+    		l.onStart(imageView, data);
     	}
     	Bitmap bitmap = null;
     	
@@ -157,15 +154,15 @@ public abstract class ImageWorker {
     	
     	if (bitmap != null && !bitmap.isRecycled() && bitmap.getConfig() == config) {
     		// Bitmap found in memory cache
-    		if(mBitmapObserver != null) {
-        		mBitmapObserver.onBitmapLoaded(imageView, bitmap);
+    		if(l != null) {
+        		l.onLoaded(imageView, bitmap);
         	}
     		imageView.setImageBitmap(bitmap);
-    		if(mBitmapObserver != null) {
-            	mBitmapObserver.onBitmapSet(imageView, bitmap);
+    		if(l != null) {
+            	l.onSet(imageView, bitmap);
             }
     	} else if (cancelPotentialWork(data, imageView)) {
-    		final BitmapWorkerTask task = new BitmapWorkerTask(imageView, config, progressBar);
+    		final BitmapWorkerTask task = new BitmapWorkerTask(imageView, config, l);
     		final AsyncDrawable asyncDrawable =
     				new AsyncDrawable(mContext.getResources(), mLoadingBitmap, task);
     		imageView.setImageDrawable(asyncDrawable);
@@ -198,14 +195,13 @@ public abstract class ImageWorker {
      *
      * @param num The URL index of the image to download.
      * @param imageView The ImageView to bind the downloaded image to.
-     * @param progressBar Loading progress call back,only for download bitmap.
      */
-    public void loadImage(int num, ImageView imageView, ProgressBar progressBar) {
+    public void loadImage(int num, ImageView imageView, LoadListener l) {
         if (mImageWorkerAdapter != null) {
-        	if(mBitmapObserver != null) {
-        		mBitmapObserver.onLoadStart(imageView, mImageWorkerAdapter.getItem(num));
+        	if(l != null) {
+        		l.onStart(imageView, mImageWorkerAdapter.getItem(num));
         	}
-            loadImage(mImageWorkerAdapter.getItem(num), imageView, progressBar);
+            loadImage(mImageWorkerAdapter.getItem(num), imageView, l);
         } else {
             throw new NullPointerException("Data not set, must call setAdapter() first.");
         }
@@ -220,13 +216,13 @@ public abstract class ImageWorker {
      *
      * @param data The URL of the image to download.
      * @param config The config of bitmap
-     * @param progressBar Loading progress call back,only for download bitmap.
+     * @param l Loading progress call back,only for download bitmap.
      * 
      * @return the bitmap
      */
-    public Bitmap loadImage(Object data, Bitmap.Config config, ProgressBar progressBar) {
-    	if(mBitmapObserver != null) {
-    		mBitmapObserver.onLoadStart(null, data);
+    public Bitmap loadImage(Object data, Bitmap.Config config, LoadListener l) {
+    	if(l != null) {
+    		l.onStart(null, data);
     	}
     	Bitmap bitmap = null;
     	String dataString = String.valueOf(data);
@@ -241,7 +237,7 @@ public abstract class ImageWorker {
         if (bitmap == null || !bitmap.isRecycled()) {
         	// Bitmap not found in memory cache and disk cache
         	try {
-        		bitmap = processBitmap(data, config, progressBar);
+        		bitmap = processBitmap(data, config, l);
         	} catch (OutOfMemoryError error) {
         		error.printStackTrace();
         		if(mImageCache != null) {
@@ -383,15 +379,6 @@ public abstract class ImageWorker {
     }
     
     /**
-     * Set the bitmap observer.
-     * @param observer
-     */
-    public void setBitmapObserver(BitmapObserver observer) {
-    	this.mBitmapObserver = observer;
-    }
-    
-
-    /**
      * If set to true, the image will fade-in once it has been loaded by the background thread.
      *
      * @param fadeIn
@@ -416,7 +403,7 @@ public abstract class ImageWorker {
      * 
      * @return The processed bitmap
      */
-    protected abstract Bitmap processBitmap(Object data, Bitmap.Config config, ProgressBar progressBar);
+    protected abstract Bitmap processBitmap(Object data, Bitmap.Config config, LoadListener l);
     
     
     public static void cancelWork(ImageView imageView) {
@@ -478,16 +465,16 @@ public abstract class ImageWorker {
         private Object mmData;
         private final WeakReference<ImageView> mmImageViewReference;
         private Bitmap.Config mmConfig = Bitmap.Config.ARGB_8888;
-        private ProgressBar mmProgressBar;
+        private LoadListener mmListener;
 
-        public BitmapWorkerTask(ImageView imageView, ProgressBar progressBar) {
+        public BitmapWorkerTask(ImageView imageView, LoadListener l) {
         	imageView.setImageBitmap(mLoadingBitmap);
             mmImageViewReference = new WeakReference<ImageView>(imageView);
-            this.mmProgressBar = progressBar;
+            this.mmListener = l;
         }
         
-        public BitmapWorkerTask(ImageView imageView, Bitmap.Config config, ProgressBar progressBar) {
-        	this(imageView, progressBar);
+        public BitmapWorkerTask(ImageView imageView, Bitmap.Config config, LoadListener l) {
+        	this(imageView, l);
         	this.mmConfig = config;
         }
         
@@ -511,6 +498,9 @@ public abstract class ImageWorker {
             	} catch (OutOfMemoryError error) {
             		error.printStackTrace();
             		mImageCache.cleanMemCache();
+            		if(mmListener != null) {
+            			mmListener.onError(mmData, error);
+            		}
 //            		bitmap = mImageCache.getBitmapFromDiskCache(dataString, mmConfig);
             	}
             }
@@ -522,9 +512,12 @@ public abstract class ImageWorker {
             if (bitmap == null && !isCancelled() && getAttachedImageView() != null
                     && !mExitTasksEarly) {
             	try {
-            		bitmap = processBitmap(params[0], mmConfig, mmProgressBar);
+            		bitmap = processBitmap(params[0], mmConfig, mmListener);
             	} catch (OutOfMemoryError e) {
             		e.printStackTrace();
+            		if(mmListener != null) {
+            			mmListener.onError(mmData, e);
+            		}
             	}
             }
 
@@ -550,18 +543,18 @@ public abstract class ImageWorker {
             }
 
             final ImageView imageView = getAttachedImageView();
-            if(mBitmapObserver != null) {
-            	mBitmapObserver.onBitmapLoaded(imageView, bitmap);
+            if(mmListener != null) {
+            	mmListener.onLoaded(imageView, bitmap);
             }
             if (bitmap != null && imageView != null) {
-                setImageBitmap(imageView, bitmap);
+                setImageBitmap(imageView, bitmap, mmListener);
             }
         }
 
     	@Override
     	protected void onCancelled() {
-    		if(mBitmapObserver != null) {
-    			mBitmapObserver.onBitmapCanceld(mmImageViewReference.get(), mmData);
+    		if(mmListener != null) {
+    			mmListener.onCanceld(mmImageViewReference.get(), mmData);
     		}
     		super.onCancelled();
     	}
@@ -610,7 +603,7 @@ public abstract class ImageWorker {
      * @param imageView
      * @param bitmap
      */
-    private void setImageBitmap(ImageView imageView, Bitmap bitmap) {
+    private void setImageBitmap(ImageView imageView, Bitmap bitmap, LoadListener l) {
     	if(bitmap == null || bitmap.isRecycled()) {
     		//If bitmap is null, set default failed bitmap.
     		bitmap = mLoadFailedBitmap;
@@ -630,8 +623,8 @@ public abstract class ImageWorker {
         } else {
             imageView.setImageBitmap(bitmap);
         }
-        if(mBitmapObserver != null) {
-        	mBitmapObserver.onBitmapSet(imageView, bitmap);
+        if(l != null) {
+        	l.onSet(imageView, bitmap);
         }
     }
 
@@ -661,33 +654,58 @@ public abstract class ImageWorker {
         public abstract int getSize();
     }
     
+    
     /**
-     * A observer to observe bitmap state.
-     * @author xiaoying
+     * 
+     * @author yinglovezhuzhu@gmail.com
      *
      */
-    public static interface BitmapObserver {
-    	
-    	public void onLoadStart(ImageView imageView, Object data);
+    public static interface LoadListener {
     	
     	/**
-    	 * This call back method only for download bitmap from the Internet.
-    	 * @param progressBar 需要展示进度的进度条，在{@link ImageWorker#loadImage(int, ImageView, ProgressBar)}<br>
-    	 * 或者{@link ImageWorker#loadImage(Object, android.graphics.Bitmap.Config, ProgressBar)}、<br>
-    	 * {@link ImageWorker#loadImage(Object, ImageView, ProgressBar)}、<br>
-    	 * {@link ImageWorker#loadImage(Object, ImageView, android.graphics.Bitmap.Config, ProgressBar)}等<br>
-    	 * 带有ProgressBar的loadImage()方法中传入，如果不穿或者传空，将无法在进度条中展示进度或者出现进度错乱的问题。
+    	 * On load start<br>
+    	 * <p>Load from local cache file or load from Internet.
+    	 * @param imageView
+    	 * @param data
+    	 */
+    	public void onStart(ImageView imageView, Object data);
+    	/**
+    	 * Show download progress.<br>
+    	 * <p>This call back method only for download bitmap from the Internet.
     	 * @param url The URL of the bitmap.
     	 * @param total The total size of the downloading bitmap.<br>
     	 * return the download file total size or -1 unknown size.
     	 * @param downloaded The downloaded size of the downloading bitmap.
     	 */
-    	public void onProgressUpdate(ProgressBar progressBar, Object url, long total, long downloaded);
+    	public void onProgressUpdate(Object url, long total, long downloaded);
     	
-    	public void onBitmapLoaded(ImageView imageView, Bitmap bitmap);
+    	/**
+    	 * Error occur when loading image<br>
+    	 * 
+    	 * @param data
+    	 * @param errorMsg
+    	 */
+    	public void onError(Object data, Object errorMsg);
     	
-    	public void onBitmapSet(ImageView imageView, Bitmap bitmap);
+    	/**
+    	 * Bitmap load finish.
+    	 * @param imageView
+    	 * @param bitmap
+    	 */
+    	public void onLoaded(ImageView imageView, Bitmap bitmap);
     	
-    	public void onBitmapCanceld(ImageView imageView, Object data);
+    	/**
+    	 * Bitmap set to an ImageView
+    	 * @param imageView
+    	 * @param bitmap
+    	 */
+    	public void onSet(ImageView imageView, Bitmap bitmap);
+    	
+    	/**
+    	 * Task has been canceled.
+    	 * @param imageView
+    	 * @param data
+    	 */
+    	public void onCanceld(ImageView imageView, Object data);
     }
 }

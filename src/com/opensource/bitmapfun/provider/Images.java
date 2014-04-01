@@ -42,8 +42,8 @@ public class Images {
      * should be used to fetch the URLs.
      */
     public static String[] imageThumbUrls = new String[] {
-        "http://p0.so.qhimg.com/sdr/200_200_/t01ff46ff98aea72e05.jpg",
-        "http://p2.so.qhimg.com/sdr/200_200_/t01d8c66378cbe51162.jpg",
+        "http://p2.so.qhimg.com/bdr/288__/t0119bef65e633cb582.jpg",
+        "http://p2.so.qhimg.com/bdr/288__/t019115137493672367.jpg",
         "http://p2.so.qhimg.com/sdr/200_200_/t01dfab67c68e80fd67.jpg",
         "http://p2.so.qhimg.com/sdr/200_200_/t01cf258dbfff8c319c.jpg",
     };
