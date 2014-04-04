@@ -46,6 +46,8 @@ public abstract class ImageWorker {
     private Bitmap mLoadFailedBitmap = null;
     private boolean mFadeInBitmap = true;
     private boolean mExitTasksEarly = false;
+    
+    private Bitmap.Config mDefaultBitmapConfig = Bitmap.Config.ARGB_8888;
 
     protected Context mContext;
     
@@ -111,7 +113,7 @@ public abstract class ImageWorker {
      * @param imageView The ImageView to bind the downloaded image to.
      */
     public void loadImage(Object data, ImageView imageView) {
-    	loadImage(data, imageView, null, null);
+    	loadImage(data, imageView, mDefaultBitmapConfig, null);
     }
 
     /**
@@ -462,7 +464,7 @@ public abstract class ImageWorker {
     private class BitmapWorkerTask extends AsyncTaskEx<Object, Void, Bitmap> {
         private Object mmData;
         private final WeakReference<ImageView> mmImageViewReference;
-        private Bitmap.Config mmConfig = Bitmap.Config.ARGB_8888;
+        private Bitmap.Config mmConfig = mDefaultBitmapConfig;
         private LoadListener mmListener;
 
         public BitmapWorkerTask(ImageView imageView, LoadListener l) {
