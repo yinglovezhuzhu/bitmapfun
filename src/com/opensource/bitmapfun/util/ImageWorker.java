@@ -53,8 +53,6 @@ public abstract class ImageWorker {
     
     protected ImageWorkerAdapter mImageWorkerAdapter;
     
-//    protected BitmapObserver mBitmapObserver = null;
-
     protected ImageWorker(Context context) {
         mContext = context;
     }

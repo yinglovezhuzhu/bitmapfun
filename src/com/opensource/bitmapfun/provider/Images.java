@@ -42,10 +42,13 @@ public class Images {
      * should be used to fetch the URLs.
      */
     public static String[] imageThumbUrls = new String[] {
-        "http://p2.so.qhimg.com/bdr/288__/t0119bef65e633cb582.jpg",
-        "http://p2.so.qhimg.com/bdr/288__/t019115137493672367.jpg",
-        "http://p2.so.qhimg.com/sdr/200_200_/t01dfab67c68e80fd67.jpg",
-        "http://p2.so.qhimg.com/sdr/200_200_/t01cf258dbfff8c319c.jpg",
+    	"http://img3.fengniao.com/forum/attachpics/666/176/26635081.jpg",
+        "http://desk.blueidea.com/DESK/QTBZ/dwbz/dwbz010.jpg",
+        "http://img3.fengniao.com/forum/attachpics/666/176/26635078.jpg",
+        "http://www.ii123.com/uploads/allimg/c121123/1353A261D0460-410C.jpg",
+        "http://img3.fengniao.com/forum/attachpics/666/176/26635077.jpg", 
+        "http://preview.quanjing.com/chineseview037/mhrf-cpmh-19218.jpg", 
+        "http://img3.fengniao.com/forum/attachpics/666/176/26635082.jpg", 
     };
 
     /**
