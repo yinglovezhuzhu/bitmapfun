@@ -34,9 +34,9 @@ import android.widget.ImageView;
 import com.opensource.bitmapfun.BuildConfig;
 
 /**
- * This class wraps up completing some arbitrary long running work when loading a bitmap to an
- * ImageView. It handles things like using a memory and disk cache, running the work in a background
- * thread and setting a placeholder image.
+ * This class wraps up completing some arbitrary long running work when loading a bitmap to an<br>
+ * ImageView. It handles things like using a memory and disk cache, running the work in a background<br>
+ * thread and setting a placeholder image.<br>
  * 
  */
 public abstract class ImageWorker {
@@ -61,16 +61,23 @@ public abstract class ImageWorker {
 
     /**
      * 
-     * Load an image specified by the data parameter into an ImageView (override
-     * {@link ImageWorker#processBitmap(Object)} to define the processing logic). A memory and disk
-     * cache will be used if an {@link ImageCache} has been set using
-     * {@link ImageWorker#setImageCache(ImageCache)}. If the image is found in the memory cache, it
-     * is set immediately, otherwise an {@link AsyncTask} will be created to asynchronously load the
-     * bitmap.
+     * Load an image specified by the data parameter into an ImageView (override<br>
+     * <p>{@link ImageWorker#processBitmap(Object)} to define the processing logic). A memory and disk<br>
+     * cache will be used if an {@link ImageCache} has been set using<br>
+     * {@link ImageWorker#setImageCache(ImageCache)}. If the image is found in the memory cache, it<br>
+     * is set immediately, otherwise an {@link AsyncTask} will be created to asynchronously load the<br>
+     * bitmap.<br>
      *
      * @param data The URL of the image to download.
      * @param isNative The data is native or not, true is native, false is Internet.
      * @param imageView The ImageView to bind the downloaded image to.
+     * 
+     * 
+     * @deprecated This method can be ambiguous to {@link #loadImage(Object, ImageView, android.graphics.Bitmap.Config)} when<br>
+     * the third parameter is null.Use {@link #loadImage(Object, ImageView, android.graphics.Bitmap.Config, LoadListener)}<br>
+     * instead.
+     * 
+     * @see {@link #loadImage(Object, ImageView, android.graphics.Bitmap.Config, LoadListener)}
      */
     public void loadImage(Object data, ImageView imageView, LoadListener l) {
     	if(l != null) {
@@ -172,12 +179,17 @@ public abstract class ImageWorker {
     
     /**
      * Load an image specified by the data parameter.
-     * A memory and disk cache will be used if an {@link ImageCache} has been set using
-     * {@link ImageWorker#setImageCache(ImageCache)}. If the image is not found in the memory or disk cache, it
-     * would load from file.
+     * A memory and disk cache will be used if an {@link ImageCache} has been set using<br>
+     * {@link ImageWorker#setImageCache(ImageCache)}. If the image is not found in the memory or disk cache, <br>
+     * it would load from file.
      * @param data
      * @param imageView
      * @param config
+     * @deprecated This method can be ambiguous to {@link #loadImage(Object, ImageView, LoadListener)} when<br>
+     * the third parameter is null.Use {@link #loadImage(Object, ImageView, android.graphics.Bitmap.Config, LoadListener)}<br>
+     * instead.
+     * 
+     * @see {@link #loadImage(Object, ImageView, android.graphics.Bitmap.Config, LoadListener)}
      */
     public void loadImage(Object data, ImageView imageView, Bitmap.Config config) {
     	loadImage(data, imageView, config, null);
