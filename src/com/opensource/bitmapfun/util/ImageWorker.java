@@ -232,7 +232,7 @@ public abstract class ImageWorker {
      * 
      * @return the bitmap
      */
-    public Bitmap loadImage(Object data, Bitmap.Config config, LoadListener l) {
+    public Bitmap getImage(Object data, Bitmap.Config config, LoadListener l) {
     	if(l != null) {
     		l.onStart(null, data);
     	}
@@ -276,8 +276,8 @@ public abstract class ImageWorker {
      * 
      * @return the bitmap
      */
-    public Bitmap loadImage(Object data, Bitmap.Config config) {
-    	return loadImage(data, config, null);
+    public Bitmap getImage(Object data, Bitmap.Config config) {
+    	return getImage(data, config, null);
     }
     
     /**
