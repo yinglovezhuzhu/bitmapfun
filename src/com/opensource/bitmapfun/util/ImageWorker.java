@@ -213,7 +213,7 @@ public abstract class ImageWorker {
         	if(l != null) {
         		l.onStart(imageView, mImageWorkerAdapter.getItem(num));
         	}
-            loadImage(mImageWorkerAdapter.getItem(num), imageView, l);
+            loadImage(mImageWorkerAdapter.getItem(num), imageView, null, l);
         } else {
             throw new NullPointerException("Data not set, must call setAdapter() first.");
         }

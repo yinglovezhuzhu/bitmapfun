@@ -22,6 +22,8 @@ import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
@@ -159,5 +161,17 @@ public class Utils {
      */
     public static boolean hasActionBar() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
+    }
+    
+    /**
+     * Check if has network connection.
+     * @param context
+     * @return
+     */
+    public static boolean isNetworkConnected(Context context) {
+    	final ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnectedOrConnecting();
     }
 }

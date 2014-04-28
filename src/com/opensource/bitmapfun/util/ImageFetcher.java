@@ -27,10 +27,7 @@ import java.net.URL;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.opensource.bitmapfun.BuildConfig;
 
@@ -39,10 +36,12 @@ import com.opensource.bitmapfun.BuildConfig;
  */
 public class ImageFetcher extends ImageResizer {
     private static final String TAG = "ImageFetcher";
+    
     private static final int DEFAULT_BUFF_SIZE = 1024 * 8; //8KB
     private static final int HTTP_CACHE_SIZE = 10 * 1024 * 1024; // 10MB
     public static final String HTTP_CACHE_DIR = "http";
     
+    private Context mContext;
 
     /**
      * Initialize providing a target image width and height for the processing images.
@@ -68,23 +67,25 @@ public class ImageFetcher extends ImageResizer {
     }
 
     private void init(Context context) {
-        checkConnection(context);
+    	mContext = context;
     }
+//        checkConnection(context);
+//    }
 
-    /**
-     * Simple network connection check.
-     *
-     * @param context
-     */
-    private void checkConnection(Context context) {
-        final ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        final NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        if (networkInfo == null || !networkInfo.isConnectedOrConnecting()) {
-            Toast.makeText(context, "No network connection found.", Toast.LENGTH_LONG).show();
-            Log.e(TAG, "checkConnection - no connection found");
-        }
-    }
+//    /**
+//     * Simple network connection check.
+//     *
+//     * @param context
+//     */
+//    private void checkConnection(Context context) {
+//        final ConnectivityManager cm =
+//                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+//        final NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+//        if (networkInfo == null || !networkInfo.isConnectedOrConnecting()) {
+//            Toast.makeText(context, "No network connection found.", Toast.LENGTH_LONG).show();
+//            Log.e(TAG, "checkConnection - no connection found");
+//        }
+//    }
 
     /**
      * The main process method, which will be called by the ImageWorker in the AsyncTask background
@@ -97,15 +98,20 @@ public class ImageFetcher extends ImageResizer {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "processBitmap - " + data);
         }
-
-        // Download a bitmap, write it to a file
-        final File f = downloadBitmap(mContext, data, l);
-
-        if (f != null) {
-            // Return a sampled down version
-            return decodeSampledBitmapFromFile(f.toString(), mImageWidth, mImageHeight, config);
+        
+        if(Utils.isNetworkConnected(mContext)) {
+	        // Download a bitmap, write it to a file
+	        final File f = downloadBitmap(mContext, data, l);
+	
+	        if (f != null) {
+	            // Return a sampled down version
+	            return decodeSampledBitmapFromFile(f.toString(), mImageWidth, mImageHeight, config);
+	        }
+        } else {
+        	if(l != null) {
+        		l.onError(data, "Network connection not found");
+        	}
         }
-
         return null;
     }
 
