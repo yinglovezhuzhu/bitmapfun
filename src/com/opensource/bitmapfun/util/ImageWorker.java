@@ -701,8 +701,6 @@ public abstract class ImageWorker {
     	
     	/**
     	 * Image download successed.<br>
-    	 * <p>Only when download image from Internet. if load image from disk cache<br>
-    	 * won't call this callback method.
     	 * @param url
     	 */
     	public void onDownloadSuccessed(Object url, File file);

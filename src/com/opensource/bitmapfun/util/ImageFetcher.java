@@ -141,6 +141,9 @@ public class ImageFetcher extends ImageResizer {
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "downloadBitmap - found in http cache - " + urlString);
             }
+            if(l != null) {
+            	l.onDownloadSuccessed(urlString, cacheFile);
+            }
             return cacheFile;
         }
 
