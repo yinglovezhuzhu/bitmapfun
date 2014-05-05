@@ -684,12 +684,6 @@ public abstract class ImageWorker {
     	public void onStart(ImageView imageView, Object data);
     	
     	/**
-    	 * Image download start.
-    	 * @param url
-    	 */
-    	public void onDownloadStart(Object url);
-    	
-    	/**
     	 * Show download progress.<br>
     	 * <p>This call back method only for download bitmap from the Internet.
     	 * @param url The URL of the bitmap.
@@ -698,12 +692,6 @@ public abstract class ImageWorker {
     	 * @param downloaded The downloaded size of the downloading bitmap.
     	 */
     	public void onProgressUpdate(Object url, long total, long downloaded);
-    	
-    	/**
-    	 * Image download successed.<br>
-    	 * @param url
-    	 */
-    	public void onDownloadSuccessed(Object url, File file);
     	
     	/**
     	 * Error occur when loading image<br>

@@ -141,9 +141,6 @@ public class ImageFetcher extends ImageResizer {
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "downloadBitmap - found in http cache - " + urlString);
             }
-            if(l != null) {
-            	l.onDownloadSuccessed(urlString, cacheFile);
-            }
             return cacheFile;
         }
 
@@ -151,9 +148,6 @@ public class ImageFetcher extends ImageResizer {
 			Log.d(TAG, "downloadBitmap - downloading - " + urlString);
 		}
 
-		if(l != null) {
-			l.onDownloadStart(urlString);
-		}
         Utils.disableConnectionReuseIfNecessary();
         HttpURLConnection urlConnection = null;
         BufferedOutputStream out = null;
@@ -214,9 +208,6 @@ public class ImageFetcher extends ImageResizer {
                     		}
                     	}
                     }
-                }
-                if(l != null) {
-                	l.onDownloadSuccessed(urlString, cacheFile);
                 }
                 return cacheFile;
             } else {

@@ -16,8 +16,6 @@
 
 package com.opensource.bitmapfun.ui;
 
-import java.io.File;
-
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -128,18 +126,6 @@ public class ImageDetailFragment extends Fragment {
 				
 				@Override
 				public void onCanceld(ImageView imageView, Object data) {
-					// TODO Auto-generated method stub
-					
-				}
-
-				@Override
-				public void onDownloadStart(Object url) {
-					// TODO Auto-generated method stub
-					
-				}
-
-				@Override
-				public void onDownloadSuccessed(Object url, File file) {
 					// TODO Auto-generated method stub
 					
 				}
