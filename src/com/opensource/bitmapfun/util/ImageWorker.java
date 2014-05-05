@@ -287,6 +287,7 @@ public abstract class ImageWorker {
      * @param height
      * @param config
      * @return
+     * @deprecated nerve use this method
      */
     public Bitmap createImage(Object data, int width, int height, Bitmap.Config config) {
     	Bitmap bitmap = null;
@@ -681,6 +682,13 @@ public abstract class ImageWorker {
     	 * @param data
     	 */
     	public void onStart(ImageView imageView, Object data);
+    	
+    	/**
+    	 * Image download start.
+    	 * @param url
+    	 */
+    	public void onDownloadStart(Object url);
+    	
     	/**
     	 * Show download progress.<br>
     	 * <p>This call back method only for download bitmap from the Internet.
@@ -690,6 +698,14 @@ public abstract class ImageWorker {
     	 * @param downloaded The downloaded size of the downloading bitmap.
     	 */
     	public void onProgressUpdate(Object url, long total, long downloaded);
+    	
+    	/**
+    	 * Image download successed.<br>
+    	 * <p>Only when download image from Internet. if load image from disk cache<br>
+    	 * won't call this callback method.
+    	 * @param url
+    	 */
+    	public void onDownloadSuccessed(Object url, File file);
     	
     	/**
     	 * Error occur when loading image<br>
